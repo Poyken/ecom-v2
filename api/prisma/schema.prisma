@@ -1,0 +1,1024 @@
+// Prisma Schema for Ecommerce Multi-Tenant Platform
+// ~30+ models with full RBAC, Catalog, Orders, Inventory, Promotions, RMA
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum TenantPlan {
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  COD
+  MOMO
+  VNPAY
+  STRIPE
+  BANK_TRANSFER
+}
+
+enum ShipmentStatus {
+  PENDING
+  READY_TO_SHIP
+  SHIPPED
+  DELIVERED
+  FAILED
+  RETURNED
+}
+
+enum ReturnStatus {
+  PENDING
+  APPROVED
+  WAITING_FOR_RETURN
+  IN_TRANSIT
+  RECEIVED
+  INSPECTING
+  REFUNDED
+  REJECTED
+  CANCELLED
+}
+
+enum ReturnType {
+  REFUND_ONLY
+  RETURN_AND_REFUND
+  EXCHANGE
+}
+
+enum RefundMethod {
+  ORIGINAL_PAYMENT
+  STORE_CREDIT
+  BANK_TRANSFER
+}
+
+enum LoyaltyPointType {
+  EARNED
+  REDEEMED
+  REFUNDED
+  EXPIRED
+}
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+enum InventoryLogType {
+  PURCHASE
+  SALE
+  RETURN
+  ADJUSTMENT
+  TRANSFER
+  RESERVED
+  RELEASED
+}
+
+enum PromotionRuleType {
+  MIN_ORDER_VALUE
+  MIN_QUANTITY
+  SPECIFIC_PRODUCT
+  SPECIFIC_CATEGORY
+  SPECIFIC_BRAND
+  FIRST_ORDER
+  CUSTOMER_GROUP
+}
+
+enum PromotionActionType {
+  DISCOUNT_PERCENT
+  DISCOUNT_FIXED
+  FREE_SHIPPING
+  FREE_PRODUCT
+}
+
+// ============================================================================
+// MULTI-TENANCY
+// ============================================================================
+
+model Tenant {
+  id             String   @id @default(uuid())
+  name           String   @db.VarChar(200)
+  slug           String   @unique @db.VarChar(100)
+  subdomain      String   @unique @db.VarChar(100)
+  customDomain   String?  @unique @db.VarChar(255)
+  plan           TenantPlan @default(BASIC)
+  logoUrl        String?  @db.VarChar(500)
+  faviconUrl     String?  @db.VarChar(500)
+  primaryColor   String?  @db.VarChar(7)
+  onboardingStep Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deletedAt      DateTime?
+
+  // Relations
+  settings       TenantSettings?
+  users          User[]
+  roles          Role[]
+  categories     Category[]
+  brands         Brand[]
+  products       Product[]
+  skus           SKU[]
+  productOptions ProductOption[]
+  warehouses     Warehouse[]
+  carts          Cart[]
+  orders         Order[]
+  promotions     Promotion[]
+  returnRequests ReturnRequest[]
+  customerGroups CustomerGroup[]
+  blogs          Blog[]
+  pages          Page[]
+  media          Media[]
+  auditLogs      AuditLog[]
+  notifications  Notification[]
+
+  @@index([slug])
+  @@index([subdomain])
+  @@index([isActive])
+}
+
+model TenantSettings {
+  id                      String   @id @default(uuid())
+  tenantId                String   @unique
+  currency                String   @default("VND") @db.VarChar(3)
+  locale                  String   @default("vi-VN") @db.VarChar(10)
+  timezone                String   @default("Asia/Ho_Chi_Minh") @db.VarChar(50)
+  freeShippingThreshold   Decimal? @db.Decimal(15, 2)
+  defaultShippingFee      Decimal  @default(30000) @db.Decimal(15, 2)
+  loyaltyPointRatio       Int      @default(1000) // 1 point per 1000 VND
+  loyaltyPointExpireDays  Int?
+  orderConfirmationEmail  Boolean  @default(true)
+  shippingNotificationEmail Boolean @default(true)
+  googleAnalyticsId       String?  @db.VarChar(50)
+  facebookPixelId         String?  @db.VarChar(50)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// USERS & RBAC
+// ============================================================================
+
+model User {
+  id                String    @id @default(uuid())
+  tenantId          String
+  email             String    @db.VarChar(255)
+  passwordHash      String?   @db.VarChar(255)
+  firstName         String?   @db.VarChar(100)
+  lastName          String?   @db.VarChar(100)
+  phone             String?   @db.VarChar(20)
+  avatarUrl         String?   @db.VarChar(500)
+  isEmailVerified   Boolean   @default(false)
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorSecret   String?   @db.VarChar(100)
+  googleId          String?   @db.VarChar(100)
+  facebookId        String?   @db.VarChar(100)
+  refreshToken      String?   @db.VarChar(500)
+  loyaltyPoints     Int       @default(0)
+  referralCode      String?   @unique @db.VarChar(20)
+  referredById      String?
+  customerGroupId   String?
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  // Relations
+  tenant         Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  referredBy     User?          @relation("Referrals", fields: [referredById], references: [id])
+  referrals      User[]         @relation("Referrals")
+  customerGroup  CustomerGroup? @relation(fields: [customerGroupId], references: [id])
+  userRoles      UserRole[]
+  addresses      Address[]
+  carts          Cart[]
+  orders         Order[]
+  reviews        Review[]
+  loyaltyHistory LoyaltyPoint[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@index([email])
+  @@index([referralCode])
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String   @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  isSystem    Boolean  @default(false) // SUPER_ADMIN, ADMIN, CUSTOMER
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  code        String   @unique @db.VarChar(100) // PRODUCT_CREATE, ORDER_VIEW
+  name        String   @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  module      String   @db.VarChar(50) // products, orders, users
+  createdAt   DateTime @default(now())
+
+  rolePermissions RolePermission[]
+
+  @@index([module])
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+model RolePermission {
+  id           String   @id @default(uuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  fullName    String   @db.VarChar(200)
+  phone       String   @db.VarChar(20)
+  street      String   @db.VarChar(500)
+  ward        String?  @db.VarChar(100)
+  district    String   @db.VarChar(100)
+  province    String   @db.VarChar(100)
+  postalCode  String?  @db.VarChar(20)
+  country     String   @default("Vietnam") @db.VarChar(100)
+  ghnWardCode String?  @db.VarChar(20)
+  ghnDistrictId Int?
+  ghnProvinceId Int?
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@index([userId])
+}
+
+// ============================================================================
+// CATALOG
+// ============================================================================
+
+model Category {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String   @db.VarChar(200)
+  slug        String   @db.VarChar(250)
+  description String?  @db.Text
+  imageUrl    String?  @db.VarChar(500)
+  parentId    String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant   Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  products Product[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([parentId])
+}
+
+model Brand {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String   @db.VarChar(200)
+  slug        String   @db.VarChar(250)
+  description String?  @db.Text
+  logoUrl     String?  @db.VarChar(500)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+model Product {
+  id              String   @id @default(uuid())
+  tenantId        String
+  name            String   @db.VarChar(500)
+  slug            String   @db.VarChar(600)
+  description     String?  @db.Text
+  shortDescription String? @db.VarChar(1000)
+  categoryId      String?
+  brandId         String?
+  isActive        Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
+  avgRating       Decimal  @default(0) @db.Decimal(2, 1)
+  reviewCount     Int      @default(0)
+  metaTitle       String?  @db.VarChar(200)
+  metaDescription String?  @db.VarChar(500)
+  metaKeywords    String?  @db.VarChar(500)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+  brand    Brand?    @relation(fields: [brandId], references: [id])
+  skus     SKU[]
+  options  ProductOption[]
+  images   ProductImage[]
+  reviews  Review[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([isActive, isFeatured])
+}
+
+model ProductOption {
+  id          String   @id @default(uuid())
+  tenantId    String
+  productId   String
+  name        String   @db.VarChar(100) // "Color", "Size"
+  displayName String?  @db.VarChar(100)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant  Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  product Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  values  OptionValue[]
+
+  @@index([productId])
+}
+
+model OptionValue {
+  id           String   @id @default(uuid())
+  optionId     String
+  value        String   @db.VarChar(100) // "Red", "Blue", "S", "M"
+  displayValue String?  @db.VarChar(100)
+  colorCode    String?  @db.VarChar(7) // "#FF0000"
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  option ProductOption   @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  skus   SKUOptionValue[]
+
+  @@index([optionId])
+}
+
+model SKU {
+  id               String   @id @default(uuid())
+  tenantId         String
+  productId        String
+  skuCode          String   @db.VarChar(100)
+  name             String?  @db.VarChar(500)
+  price            Decimal  @db.Decimal(15, 2)
+  salePrice        Decimal? @db.Decimal(15, 2)
+  costPrice        Decimal? @db.Decimal(15, 2)
+  stock            Int      @default(0)
+  lowStockThreshold Int     @default(10)
+  weight           Decimal? @db.Decimal(10, 2) // grams
+  barcode          String?  @db.VarChar(100)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tenant         Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  product        Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  optionValues   SKUOptionValue[]
+  images         SKUImage[]
+  inventoryItems InventoryItem[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+
+  @@unique([tenantId, skuCode])
+  @@index([tenantId])
+  @@index([productId])
+  @@index([isActive])
+}
+
+model SKUOptionValue {
+  id            String @id @default(uuid())
+  skuId         String
+  optionValueId String
+
+  sku         SKU         @relation(fields: [skuId], references: [id], onDelete: Cascade)
+  optionValue OptionValue @relation(fields: [optionValueId], references: [id], onDelete: Cascade)
+
+  @@unique([skuId, optionValueId])
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  productId String
+  url       String   @db.VarChar(500)
+  altText   String?  @db.VarChar(200)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+model SKUImage {
+  id        String   @id @default(uuid())
+  skuId     String
+  url       String   @db.VarChar(500)
+  altText   String?  @db.VarChar(200)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  sku SKU @relation(fields: [skuId], references: [id], onDelete: Cascade)
+
+  @@index([skuId])
+}
+
+// ============================================================================
+// INVENTORY
+// ============================================================================
+
+model Warehouse {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String   @db.VarChar(200)
+  code        String   @db.VarChar(50)
+  address     String?  @db.VarChar(500)
+  phone       String?  @db.VarChar(20)
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  inventoryItems InventoryItem[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+}
+
+model InventoryItem {
+  id            String   @id @default(uuid())
+  skuId         String
+  warehouseId   String
+  quantity      Int      @default(0)
+  reservedQty   Int      @default(0)
+  minStockLevel Int      @default(10)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sku       SKU            @relation(fields: [skuId], references: [id], onDelete: Cascade)
+  warehouse Warehouse      @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  logs      InventoryLog[]
+
+  @@unique([skuId, warehouseId])
+  @@index([skuId])
+  @@index([warehouseId])
+}
+
+model InventoryLog {
+  id              String           @id @default(uuid())
+  inventoryItemId String
+  type            InventoryLogType
+  quantity        Int              // positive or negative
+  previousQty     Int
+  newQty          Int
+  referenceType   String?          @db.VarChar(50) // "order", "return", "purchase"
+  referenceId     String?
+  note            String?          @db.VarChar(500)
+  createdById     String?
+  createdAt       DateTime         @default(now())
+
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+
+  @@index([inventoryItemId])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// CART & ORDERS
+// ============================================================================
+
+model Cart {
+  id             String   @id @default(uuid())
+  tenantId       String
+  userId         String?
+  sessionId      String?  @db.VarChar(100)
+  promotionCode  String?  @db.VarChar(50)
+  discountAmount Decimal  @default(0) @db.Decimal(15, 2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User?      @relation(fields: [userId], references: [id])
+  items  CartItem[]
+
+  @@unique([tenantId, userId])
+  @@index([tenantId])
+  @@index([sessionId])
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  skuId     String
+  quantity  Int
+  price     Decimal  @db.Decimal(15, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  sku  SKU  @relation(fields: [skuId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, skuId])
+  @@index([cartId])
+}
+
+model Order {
+  id                 String        @id @default(uuid())
+  tenantId           String
+  userId             String
+  orderNumber        String        @db.VarChar(50)
+  status             OrderStatus   @default(PENDING)
+  paymentStatus      PaymentStatus @default(UNPAID)
+  paymentMethod      PaymentMethod?
+  
+  // Pricing
+  subtotal           Decimal       @db.Decimal(15, 2)
+  shippingFee        Decimal       @default(0) @db.Decimal(15, 2)
+  discountAmount     Decimal       @default(0) @db.Decimal(15, 2)
+  taxAmount          Decimal       @default(0) @db.Decimal(15, 2)
+  totalAmount        Decimal       @db.Decimal(15, 2)
+  
+  // Shipping Address Snapshot
+  addressId          String?
+  shippingFullName   String        @db.VarChar(200)
+  shippingPhone      String        @db.VarChar(20)
+  shippingStreet     String        @db.VarChar(500)
+  shippingWard       String?       @db.VarChar(100)
+  shippingDistrict   String        @db.VarChar(100)
+  shippingProvince   String        @db.VarChar(100)
+  shippingPostalCode String?       @db.VarChar(20)
+  shippingCountry    String        @default("Vietnam") @db.VarChar(100)
+  
+  // Promotion
+  promotionId        String?
+  promotionCode      String?       @db.VarChar(50)
+  
+  // Notes
+  customerNote       String?       @db.VarChar(1000)
+  adminNote          String?       @db.VarChar(1000)
+  
+  // Timestamps
+  paidAt             DateTime?
+  shippedAt          DateTime?
+  deliveredAt        DateTime?
+  cancelledAt        DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  deletedAt          DateTime?
+
+  tenant     Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [userId], references: [id])
+  address    Address?       @relation(fields: [addressId], references: [id])
+  promotion  Promotion?     @relation(fields: [promotionId], references: [id])
+  items      OrderItem[]
+  payments   Payment[]
+  shipments  Shipment[]
+  returns    ReturnRequest[]
+
+  @@unique([tenantId, orderNumber])
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id                String   @id @default(uuid())
+  orderId           String
+  skuId             String
+  
+  // Snapshot at purchase time
+  skuCode           String   @db.VarChar(100)
+  productName       String   @db.VarChar(500)
+  skuName           String?  @db.VarChar(500)
+  price             Decimal  @db.Decimal(15, 2)
+  quantity          Int
+  totalPrice        Decimal  @db.Decimal(15, 2)
+  
+  // Fulfillment
+  fulfilledQuantity Int      @default(0)
+  
+  createdAt         DateTime @default(now())
+
+  order        Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sku          SKU                @relation(fields: [skuId], references: [id])
+  shipmentItems ShipmentItem[]
+  returnItems  ReturnItem[]
+
+  @@index([orderId])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  orderId       String
+  method        PaymentMethod
+  amount        Decimal       @db.Decimal(15, 2)
+  status        PaymentStatus @default(PENDING)
+  transactionId String?       @db.VarChar(200)
+  paymentUrl    String?       @db.VarChar(1000)
+  paidAt        DateTime?
+  metadata      Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([transactionId])
+}
+
+model Shipment {
+  id               String         @id @default(uuid())
+  orderId          String
+  trackingNumber   String?        @db.VarChar(100)
+  carrier          String?        @db.VarChar(100) // GHN, GHTK
+  status           ShipmentStatus @default(PENDING)
+  estimatedDelivery DateTime?
+  shippedAt        DateTime?
+  deliveredAt      DateTime?
+  note             String?        @db.VarChar(500)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  order Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  items ShipmentItem[]
+
+  @@index([orderId])
+  @@index([trackingNumber])
+}
+
+model ShipmentItem {
+  id          String @id @default(uuid())
+  shipmentId  String
+  orderItemId String
+  quantity    Int
+
+  shipment  Shipment  @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
+}
+
+// ============================================================================
+// PROMOTIONS
+// ============================================================================
+
+model Promotion {
+  id             String    @id @default(uuid())
+  tenantId       String
+  code           String    @db.VarChar(50)
+  name           String    @db.VarChar(200)
+  description    String?   @db.Text
+  isActive       Boolean   @default(true)
+  startDate      DateTime
+  endDate        DateTime?
+  usageLimit     Int?
+  usageCount     Int       @default(0)
+  perUserLimit   Int?
+  minOrderValue  Decimal?  @db.Decimal(15, 2)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  tenant  Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  rules   PromotionRule[]
+  actions PromotionAction[]
+  usages  PromotionUsage[]
+  orders  Order[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@index([code])
+  @@index([isActive, startDate, endDate])
+}
+
+model PromotionRule {
+  id          String            @id @default(uuid())
+  promotionId String
+  type        PromotionRuleType
+  value       Json              // { categoryId: "...", minQty: 3, etc }
+  createdAt   DateTime          @default(now())
+
+  promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+
+  @@index([promotionId])
+}
+
+model PromotionAction {
+  id          String              @id @default(uuid())
+  promotionId String
+  type        PromotionActionType
+  value       Decimal             @db.Decimal(15, 2) // discount amount or percent
+  maxDiscount Decimal?            @db.Decimal(15, 2)
+  createdAt   DateTime            @default(now())
+
+  promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+
+  @@index([promotionId])
+}
+
+model PromotionUsage {
+  id          String   @id @default(uuid())
+  promotionId String
+  userId      String
+  orderId     String?
+  usedAt      DateTime @default(now())
+
+  promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+
+  @@index([promotionId])
+  @@index([userId])
+}
+
+// ============================================================================
+// RETURNS (RMA)
+// ============================================================================
+
+model ReturnRequest {
+  id            String       @id @default(uuid())
+  tenantId      String
+  orderId       String
+  returnNumber  String       @db.VarChar(50)
+  type          ReturnType
+  status        ReturnStatus @default(PENDING)
+  reason        String       @db.VarChar(1000)
+  refundMethod  RefundMethod?
+  refundAmount  Decimal?     @db.Decimal(15, 2)
+  adminNote     String?      @db.VarChar(1000)
+  approvedAt    DateTime?
+  receivedAt    DateTime?
+  refundedAt    DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  tenant Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  order  Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  items  ReturnItem[]
+
+  @@unique([tenantId, returnNumber])
+  @@index([tenantId])
+  @@index([orderId])
+  @@index([status])
+}
+
+model ReturnItem {
+  id              String  @id @default(uuid())
+  returnRequestId String
+  orderItemId     String
+  quantity        Int
+  reason          String? @db.VarChar(500)
+
+  returnRequest ReturnRequest @relation(fields: [returnRequestId], references: [id], onDelete: Cascade)
+  orderItem     OrderItem     @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@index([returnRequestId])
+}
+
+// ============================================================================
+// LOYALTY & CUSTOMERS
+// ============================================================================
+
+model CustomerGroup {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String   @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  discount    Decimal? @db.Decimal(5, 2) // percentage
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  users  User[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model LoyaltyPoint {
+  id          String           @id @default(uuid())
+  userId      String
+  type        LoyaltyPointType
+  points      Int
+  orderId     String?
+  description String?          @db.VarChar(500)
+  expiresAt   DateTime?
+  createdAt   DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ============================================================================
+// REVIEWS
+// ============================================================================
+
+model Review {
+  id             String    @id @default(uuid())
+  productId      String
+  userId         String
+  rating         Int       @db.SmallInt // 1-5
+  title          String?   @db.VarChar(200)
+  content        String?   @db.Text
+  sentiment      Sentiment?
+  isVerifiedPurchase Boolean @default(false)
+  isApproved     Boolean   @default(false)
+  approvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
+  @@index([productId])
+  @@index([userId])
+  @@index([rating])
+}
+
+// ============================================================================
+// CMS
+// ============================================================================
+
+model Blog {
+  id              String    @id @default(uuid())
+  tenantId        String
+  title           String    @db.VarChar(300)
+  slug            String    @db.VarChar(350)
+  excerpt         String?   @db.VarChar(500)
+  content         String    @db.Text
+  coverImageUrl   String?   @db.VarChar(500)
+  authorId        String?
+  isPublished     Boolean   @default(false)
+  publishedAt     DateTime?
+  metaTitle       String?   @db.VarChar(200)
+  metaDescription String?   @db.VarChar(500)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([isPublished])
+}
+
+model Page {
+  id              String   @id @default(uuid())
+  tenantId        String
+  title           String   @db.VarChar(200)
+  slug            String   @db.VarChar(250)
+  content         String   @db.Text
+  isPublished     Boolean  @default(false)
+  metaTitle       String?  @db.VarChar(200)
+  metaDescription String?  @db.VarChar(500)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+// ============================================================================
+// INFRASTRUCTURE
+// ============================================================================
+
+model Media {
+  id          String   @id @default(uuid())
+  tenantId    String
+  filename    String   @db.VarChar(255)
+  originalName String  @db.VarChar(255)
+  mimeType    String   @db.VarChar(100)
+  size        Int      // bytes
+  url         String   @db.VarChar(500)
+  folder      String?  @db.VarChar(100)
+  uploadedById String?
+  createdAt   DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([folder])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  tenantId    String
+  userId      String?
+  action      String   @db.VarChar(100) // CREATE, UPDATE, DELETE
+  entityType  String   @db.VarChar(100) // Product, Order
+  entityId    String?
+  oldValues   Json?
+  newValues   Json?
+  ipAddress   String?  @db.VarChar(45)
+  userAgent   String?  @db.VarChar(500)
+  createdAt   DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([entityType, entityId])
+}
+
+model OutboxEvent {
+  id          String   @id @default(uuid())
+  eventType   String   @db.VarChar(100)
+  payload     Json
+  processedAt DateTime?
+  error       String?  @db.Text
+  retryCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([processedAt])
+  @@index([createdAt])
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  tenantId    String
+  userId      String?
+  type        String   @db.VarChar(50) // ORDER_CREATED, PAYMENT_RECEIVED
+  title       String   @db.VarChar(200)
+  content     String   @db.Text
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([userId, isRead])
+}
