@@ -8,3 +8,11 @@ export const ConfigValidationSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(10),
   FRONTEND_URL: z.string().url(),
 });
+
+export const validate = (config: Record<string, unknown>) => {
+  const result = ConfigValidationSchema.safeParse(config);
+  if (!result.success) {
+    throw new Error('Config validation error: ' + result.error.message);
+  }
+  return result.data;
+};

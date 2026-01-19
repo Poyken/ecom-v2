@@ -9,14 +9,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const app_controller_1 = require("./app.controller");
-const app_service_1 = require("./app.service");
+const nestjs_cls_1 = require("nestjs-cls");
 const prisma_module_1 = require("./common/prisma/prisma.module");
+const tenancy_module_1 = require("./common/tenancy/tenancy.module");
+const tenancy_middleware_1 = require("./common/tenancy/tenancy.middleware");
+const auth_module_1 = require("./modules/auth/auth.module");
 const core_1 = require("@nestjs/core");
 const global_exception_filter_1 = require("./common/filters/global-exception.filter");
 const transform_interceptor_1 = require("./common/interceptors/transform.interceptor");
 const config_schema_1 = require("./common/config/config.schema");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer
+            .apply(tenancy_middleware_1.TenancyMiddleware)
+            .exclude({ path: 'auth/register', method: common_1.RequestMethod.POST }, { path: 'health', method: common_1.RequestMethod.GET }, { path: 'api/health', method: common_1.RequestMethod.GET })
+            .forRoutes('*');
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
@@ -24,19 +32,17 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
-                validate: (config) => {
-                    const result = config_schema_1.ConfigValidationSchema.safeParse(config);
-                    if (!result.success) {
-                        throw new Error('Config validation error: ' + result.error.message);
-                    }
-                    return result.data;
-                },
+                validate: config_schema_1.validate,
+            }),
+            nestjs_cls_1.ClsModule.forRoot({
+                global: true,
+                middleware: { mount: true },
             }),
             prisma_module_1.PrismaModule,
+            tenancy_module_1.TenancyModule,
+            auth_module_1.AuthModule,
         ],
-        controllers: [app_controller_1.AppController],
         providers: [
-            app_service_1.AppService,
             {
                 provide: core_1.APP_FILTER,
                 useClass: global_exception_filter_1.GlobalExceptionFilter,

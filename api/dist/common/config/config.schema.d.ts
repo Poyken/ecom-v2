@@ -7,17 +7,25 @@ export declare const ConfigValidationSchema: z.ZodObject<{
     JWT_REFRESH_SECRET: z.ZodString;
     FRONTEND_URL: z.ZodString;
 }, "strip", z.ZodTypeAny, {
+    JWT_SECRET: string;
+    JWT_REFRESH_SECRET: string;
     DATABASE_URL: string;
     REDIS_URL: string;
     PORT: number;
-    JWT_SECRET: string;
-    JWT_REFRESH_SECRET: string;
     FRONTEND_URL: string;
 }, {
-    DATABASE_URL: string;
-    REDIS_URL: string;
     JWT_SECRET: string;
     JWT_REFRESH_SECRET: string;
+    DATABASE_URL: string;
+    REDIS_URL: string;
     FRONTEND_URL: string;
     PORT?: number | undefined;
 }>;
+export declare const validate: (config: Record<string, unknown>) => {
+    JWT_SECRET: string;
+    JWT_REFRESH_SECRET: string;
+    DATABASE_URL: string;
+    REDIS_URL: string;
+    PORT: number;
+    FRONTEND_URL: string;
+};

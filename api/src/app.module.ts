@@ -1,30 +1,31 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ClsModule } from 'nestjs-cls';
 import { PrismaModule } from './common/prisma/prisma.module';
+import { TenancyModule } from './common/tenancy/tenancy.module';
+import { TenancyMiddleware } from './common/tenancy/tenancy.middleware';
+import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-import { ConfigValidationSchema } from './common/config/config.schema';
+import { validate } from './common/config/config.schema';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      validate: (config) => {
-        const result = ConfigValidationSchema.safeParse(config);
-        if (!result.success) {
-          throw new Error('Config validation error: ' + result.error.message);
-        }
-        return result.data;
-      },
+      validate,
+    }),
+    ClsModule.forRoot({
+      global: true,
+      middleware: { mount: true },
     }),
     PrismaModule,
+    TenancyModule,
+    AuthModule,
   ],
-  controllers: [AppController],
+
   providers: [
-    AppService,
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
@@ -35,4 +36,15 @@ import { ConfigValidationSchema } from './common/config/config.schema';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(TenancyMiddleware)
+      .exclude(
+        { path: 'auth/register', method: RequestMethod.POST },
+        { path: 'health', method: RequestMethod.GET },
+        { path: 'api/health', method: RequestMethod.GET },
+      )
+      .forRoutes('*');
+  }
+}
