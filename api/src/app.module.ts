@@ -13,9 +13,11 @@ import { validate } from './common/config/config.schema';
 import { CartModule } from './modules/cart/cart.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 
 import { RolesGuard } from './common/guards/roles.guard';
+import { PromotionsModule } from './modules/promotions/promotions.module';
 
 @Module({
   imports: [
@@ -34,7 +36,9 @@ import { RolesGuard } from './common/guards/roles.guard';
     CartModule,
     OrdersModule,
     InventoryModule,
+    AnalyticsModule,
     PaymentsModule,
+    PromotionsModule,
   ],
 
   providers: [

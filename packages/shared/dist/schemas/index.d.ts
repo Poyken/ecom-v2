@@ -43,3 +43,4 @@ export * from './cart.schema';
 export * from './order.schema';
 export * from './inventory.schema';
 export * from './payment.schema';
+export * from './promotion.schema';

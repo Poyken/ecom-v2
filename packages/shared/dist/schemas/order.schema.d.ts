@@ -1,15 +1,18 @@
 import { z } from 'zod';
 export declare const CreateOrderSchema: z.ZodObject<{
     addressId: z.ZodOptional<z.ZodString>;
-    paymentMethod: z.ZodDefault<z.ZodEnum<["COD", "BANK_TRANSFER"]>>;
+    paymentMethod: z.ZodEnum<["COD", "BANK_TRANSFER", "STRIPE", "PAYPAL"]>;
+    voucherCode: z.ZodOptional<z.ZodString>;
     note: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    paymentMethod: "COD" | "BANK_TRANSFER";
+    paymentMethod: "COD" | "BANK_TRANSFER" | "STRIPE" | "PAYPAL";
     addressId?: string | undefined;
+    voucherCode?: string | undefined;
     note?: string | undefined;
 }, {
+    paymentMethod: "COD" | "BANK_TRANSFER" | "STRIPE" | "PAYPAL";
     addressId?: string | undefined;
-    paymentMethod?: "COD" | "BANK_TRANSFER" | undefined;
+    voucherCode?: string | undefined;
     note?: string | undefined;
 }>;
 export type CreateOrderDto = z.infer<typeof CreateOrderSchema>;

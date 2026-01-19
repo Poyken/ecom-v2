@@ -22,8 +22,10 @@ const config_schema_1 = require("./common/config/config.schema");
 const cart_module_1 = require("./modules/cart/cart.module");
 const orders_module_1 = require("./modules/orders/orders.module");
 const inventory_module_1 = require("./modules/inventory/inventory.module");
+const analytics_module_1 = require("./modules/analytics/analytics.module");
 const payments_module_1 = require("./modules/payments/payments.module");
 const roles_guard_1 = require("./common/guards/roles.guard");
+const promotions_module_1 = require("./modules/promotions/promotions.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -51,7 +53,9 @@ exports.AppModule = AppModule = __decorate([
             cart_module_1.CartModule,
             orders_module_1.OrdersModule,
             inventory_module_1.InventoryModule,
+            analytics_module_1.AnalyticsModule,
             payments_module_1.PaymentsModule,
+            promotions_module_1.PromotionsModule,
         ],
         providers: [
             {

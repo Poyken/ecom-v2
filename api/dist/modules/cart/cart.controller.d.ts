@@ -4,6 +4,10 @@ export declare class CartController {
     private readonly cartService;
     constructor(cartService: CartService);
     getCart(req: any): Promise<{
+        subTotal: number;
+        totalAmount: number;
+        discountAmount: number;
+        appliedPromotions: any[];
         items: ({
             sku: {
                 product: {
@@ -64,7 +68,6 @@ export declare class CartController {
             quantity: number;
             cartId: string;
         })[];
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -72,6 +75,10 @@ export declare class CartController {
         userId: string;
     }>;
     addToCart(req: any, addToCartDto: AddToCartDto): Promise<{
+        subTotal: number;
+        totalAmount: number;
+        discountAmount: number;
+        appliedPromotions: any[];
         items: ({
             sku: {
                 product: {
@@ -132,7 +139,6 @@ export declare class CartController {
             quantity: number;
             cartId: string;
         })[];
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -140,6 +146,10 @@ export declare class CartController {
         userId: string;
     }>;
     updateCartItem(req: any, itemId: string, dto: UpdateCartItemDto): Promise<{
+        subTotal: number;
+        totalAmount: number;
+        discountAmount: number;
+        appliedPromotions: any[];
         items: ({
             sku: {
                 product: {
@@ -200,7 +210,6 @@ export declare class CartController {
             quantity: number;
             cartId: string;
         })[];
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -208,6 +217,10 @@ export declare class CartController {
         userId: string;
     }>;
     removeCartItem(req: any, itemId: string): Promise<{
+        subTotal: number;
+        totalAmount: number;
+        discountAmount: number;
+        appliedPromotions: any[];
         items: ({
             sku: {
                 product: {
@@ -268,7 +281,6 @@ export declare class CartController {
             quantity: number;
             cartId: string;
         })[];
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;

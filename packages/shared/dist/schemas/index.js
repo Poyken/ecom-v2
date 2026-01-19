@@ -38,4 +38,5 @@ __exportStar(require("./cart.schema"), exports);
 __exportStar(require("./order.schema"), exports);
 __exportStar(require("./inventory.schema"), exports);
 __exportStar(require("./payment.schema"), exports);
+__exportStar(require("./promotion.schema"), exports);
 //# sourceMappingURL=index.js.map

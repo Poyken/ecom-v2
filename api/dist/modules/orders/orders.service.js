@@ -15,29 +15,34 @@ const prisma_service_1 = require("../../common/prisma/prisma.service");
 const nestjs_cls_1 = require("nestjs-cls");
 const cart_service_1 = require("../cart/cart.service");
 const inventory_service_1 = require("../inventory/inventory.service");
+const promotions_service_1 = require("../promotions/promotions.service");
 let OrdersService = class OrdersService {
     prisma;
     cls;
     cartService;
     inventoryService;
-    constructor(prisma, cls, cartService, inventoryService) {
+    promotionsService;
+    constructor(prisma, cls, cartService, inventoryService, promotionsService) {
         this.prisma = prisma;
         this.cls = cls;
         this.cartService = cartService;
         this.inventoryService = inventoryService;
+        this.promotionsService = promotionsService;
     }
     get tenantId() {
         return this.cls.get('TENANT_ID');
     }
-    async create(userId, createOrderDto) {
-        const { addressId, paymentMethod, note } = createOrderDto;
-        const cart = await this.cartService.getCart(userId);
-        if (!cart.items || cart.items.length === 0) {
+    async create(createOrderDto) {
+        const userId = this.cls.get('USER_ID');
+        const tenantId = this.cls.get('TENANT_ID');
+        const { addressId, paymentMethod, voucherCode } = createOrderDto;
+        const cartData = await this.cartService.getCart(userId, voucherCode);
+        if (!cartData.items || cartData.items.length === 0) {
             throw new common_1.BadRequestException('Cart is empty');
         }
-        let totalAmount = 0;
+        const { subTotal, totalAmount, discountAmount, appliedPromotions } = cartData;
         const orderItemsData = [];
-        for (const item of cart.items) {
+        for (const item of cartData.items) {
             if (item.sku.stock < item.quantity) {
                 throw new common_1.BadRequestException(`Product ${item.sku.product.name} (SKU: ${item.sku.skuCode}) is out of stock`);
             }
@@ -45,14 +50,12 @@ let OrdersService = class OrdersService {
             if (!price)
                 throw new common_1.BadRequestException(`SKU ${item.sku.skuCode} has no price`);
             const lineTotal = price * item.quantity;
-            totalAmount += lineTotal;
             orderItemsData.push({
                 skuId: item.skuId,
                 productName: item.sku.product.name,
                 skuCode: item.sku.skuCode,
                 quantity: item.quantity,
-                price: price,
-                total: lineTotal,
+                priceAtPurchase: price,
                 tenantId: this.tenantId
             });
         }
@@ -65,7 +68,9 @@ let OrdersService = class OrdersService {
                     status: 'PENDING',
                     paymentStatus: 'UNPAID',
                     paymentMethod,
+                    subTotal,
                     totalAmount,
+                    discountAmount,
                     recipientName: addressData.recipientName,
                     phoneNumber: addressData.phoneNumber,
                     shippingAddress: addressData.shippingAddress,
@@ -80,11 +85,26 @@ let OrdersService = class OrdersService {
                 }
             });
             const defaultWh = await this.inventoryService.findDefaultWarehouse(tx);
-            for (const item of cart.items) {
+            for (const item of cartData.items) {
                 await this.inventoryService.reserveStock(item.skuId, defaultWh.id, item.quantity, tx);
             }
+            for (const applied of appliedPromotions) {
+                await tx.promotionUsage.create({
+                    data: {
+                        promotionId: applied.id,
+                        userId,
+                        orderId: newOrder.id,
+                        discountAmount: applied.discount,
+                        tenantId: this.tenantId
+                    }
+                });
+                await tx.promotion.update({
+                    where: { id: applied.id },
+                    data: { usedCount: { increment: 1 } }
+                });
+            }
             await tx.cartItem.deleteMany({
-                where: { cartId: cart.id }
+                where: { cartId: cartData.id }
             });
             return newOrder;
         });
@@ -191,6 +211,7 @@ exports.OrdersService = OrdersService = __decorate([
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         nestjs_cls_1.ClsService,
         cart_service_1.CartService,
-        inventory_service_1.InventoryService])
+        inventory_service_1.InventoryService,
+        promotions_service_1.PromotionsService])
 ], OrdersService);
 //# sourceMappingURL=orders.service.js.map

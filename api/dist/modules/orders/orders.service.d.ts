@@ -3,14 +3,16 @@ import { ClsService } from 'nestjs-cls';
 import { CartService } from '../cart/cart.service';
 import type { CreateOrderDto } from '@ecommerce/shared';
 import { InventoryService } from '../inventory/inventory.service';
+import { PromotionsService } from '../promotions/promotions.service';
 export declare class OrdersService {
     private readonly prisma;
     private readonly cls;
     private readonly cartService;
     private readonly inventoryService;
-    constructor(prisma: PrismaService, cls: ClsService, cartService: CartService, inventoryService: InventoryService);
+    private readonly promotionsService;
+    constructor(prisma: PrismaService, cls: ClsService, cartService: CartService, inventoryService: InventoryService, promotionsService: PromotionsService);
     private get tenantId();
-    create(userId: string, createOrderDto: CreateOrderDto): Promise<{
+    create(createOrderDto: CreateOrderDto): Promise<{
         id: string;
         deletedAt: Date | null;
         createdAt: Date;
@@ -20,7 +22,9 @@ export declare class OrdersService {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;
@@ -67,7 +71,9 @@ export declare class OrdersService {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;
@@ -146,7 +152,9 @@ export declare class OrdersService {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;
@@ -180,7 +188,9 @@ export declare class OrdersService {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;
@@ -233,7 +243,9 @@ export declare class OrdersService {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;

@@ -137,4 +137,13 @@ Quy trình BẮT BUỘC để tránh hiểu sai ý (Hallucination):
 3.  **Confirm**: Chỉ khi User gõ "OK" / "Confirm", mới được sang bước `Implementation Plan`.
 4.  **Execute**: Code -> Verify -> Report.
 
-_Tuyệt đối không tự ý "đoán" rồi code luôn._
+## _Tuyệt đối không tự ý "đoán" rồi code luôn._
+
+## 12. Turbo Mode (Autonomous Execution) ⚡
+
+Khi người dùng cấp quyền bằng lệnh **"Turbo OK"**:
+
+- Agent được phép thực hiện chuỗi hành động "Code -> Build -> Verify -> Document" tự động.
+- **BẮT BUỘC** phải tự verify build sau mỗi thay đổi lớn.
+- Chỉ dừng lại khi hoàn thành Batch hoặc gặp lỗi nghiêm trọng (Blocker).
+- Tuyệt đối không được bỏ qua `implementation_plan.md` (vẫn cần 1 lần approval cho Batch).

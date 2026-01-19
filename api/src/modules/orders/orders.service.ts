@@ -5,6 +5,7 @@ import { CartService } from '../cart/cart.service';
 import type { CreateOrderDto } from '@ecommerce/shared';
 
 import { InventoryService } from '../inventory/inventory.service';
+import { PromotionsService } from '../promotions/promotions.service';
 
 @Injectable()
 export class OrdersService {
@@ -13,48 +14,44 @@ export class OrdersService {
     private readonly cls: ClsService,
     private readonly cartService: CartService,
     private readonly inventoryService: InventoryService,
+    private readonly promotionsService: PromotionsService,
   ) {}
 
   private get tenantId() {
     return this.cls.get('TENANT_ID');
   }
 
-  async create(userId: string, createOrderDto: CreateOrderDto) {
-    const { addressId, paymentMethod, note } = createOrderDto;
+  async create(createOrderDto: CreateOrderDto) {
+    const userId = this.cls.get('USER_ID');
+    const tenantId = this.cls.get('TENANT_ID');
+    const { addressId, paymentMethod, voucherCode } = createOrderDto;
 
-    // Get Cart
-    const cart = await this.cartService.getCart(userId);
-    if (!cart.items || cart.items.length === 0) {
+    // Get Cart (Calculates subTotal and discounts)
+    const cartData = await this.cartService.getCart(userId, voucherCode);
+    if (!cartData.items || cartData.items.length === 0) {
         throw new BadRequestException('Cart is empty');
     }
 
-    // Calculate Totals
-    let totalAmount = 0;
+    const { subTotal, totalAmount, discountAmount, appliedPromotions } = cartData;
     const orderItemsData: any[] = [];
 
-    // Verify Stock & Calculate
-    for (const item of cart.items) {
+    // Verify Stock & Prepare Item Data
+    for (const item of cartData.items) {
         if (item.sku.stock < item.quantity) {
              throw new BadRequestException(`Product ${item.sku.product.name} (SKU: ${item.sku.skuCode}) is out of stock`);
         }
         
         const price = Number(item.sku.price); 
-        // Note: Prisma Schema says price is Decimal?. Shared Schema says number. 
-        // We need to handle this carefully.
-        // Assuming price exists.
-        
         if (!price) throw new BadRequestException(`SKU ${item.sku.skuCode} has no price`);
 
         const lineTotal = price * item.quantity;
-        totalAmount += lineTotal;
 
         orderItemsData.push({
             skuId: item.skuId,
             productName: item.sku.product.name,
             skuCode: item.sku.skuCode,
             quantity: item.quantity,
-            price: price,
-            total: lineTotal,
+            priceAtPurchase: price,
             tenantId: this.tenantId
         });
     }
@@ -71,7 +68,9 @@ export class OrdersService {
                 status: 'PENDING',
                 paymentStatus: 'UNPAID',
                 paymentMethod,
+                subTotal,
                 totalAmount,
+                discountAmount,
                 recipientName: addressData.recipientName,
                 phoneNumber: addressData.phoneNumber,
                 shippingAddress: addressData.shippingAddress,
@@ -90,7 +89,7 @@ export class OrdersService {
         // For MVP, we reserve from the default warehouse
         const defaultWh = await this.inventoryService.findDefaultWarehouse(tx);
         
-        for (const item of cart.items) {
+        for (const item of cartData.items) {
             await this.inventoryService.reserveStock(
                 item.skuId,
                 defaultWh.id,
@@ -99,9 +98,28 @@ export class OrdersService {
             );
         }
 
-        // 3. Clear Cart
+        // 3. Record Promotion Usage
+        for (const applied of appliedPromotions) {
+            await tx.promotionUsage.create({
+                data: {
+                    promotionId: applied.id,
+                    userId,
+                    orderId: newOrder.id,
+                    discountAmount: applied.discount,
+                    tenantId: this.tenantId
+                }
+            });
+            
+            // 4. Update usedCount
+            await tx.promotion.update({
+                where: { id: applied.id },
+                data: { usedCount: { increment: 1 } }
+            });
+        }
+
+        // 5. Clear Cart
         await tx.cartItem.deleteMany({
-            where: { cartId: cart.id }
+            where: { cartId: cartData.id }
         });
 
         return newOrder;

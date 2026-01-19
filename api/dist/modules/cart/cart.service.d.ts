@@ -1,12 +1,18 @@
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ClsService } from 'nestjs-cls';
 import type { AddToCartDto, UpdateCartItemDto } from '@ecommerce/shared';
+import { PromotionsService } from '../promotions/promotions.service';
 export declare class CartService {
     private readonly prisma;
     private readonly cls;
-    constructor(prisma: PrismaService, cls: ClsService);
+    private readonly promotionsService;
+    constructor(prisma: PrismaService, cls: ClsService, promotionsService: PromotionsService);
     private get tenantId();
-    getCart(userId: string): Promise<{
+    getCart(userId: string, voucherCode?: string): Promise<{
+        subTotal: number;
+        totalAmount: number;
+        discountAmount: number;
+        appliedPromotions: any[];
         items: ({
             sku: {
                 product: {
@@ -67,7 +73,6 @@ export declare class CartService {
             quantity: number;
             cartId: string;
         })[];
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -75,6 +80,10 @@ export declare class CartService {
         userId: string;
     }>;
     addToCart(userId: string, addToCartDto: AddToCartDto): Promise<{
+        subTotal: number;
+        totalAmount: number;
+        discountAmount: number;
+        appliedPromotions: any[];
         items: ({
             sku: {
                 product: {
@@ -135,7 +144,6 @@ export declare class CartService {
             quantity: number;
             cartId: string;
         })[];
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -143,6 +151,10 @@ export declare class CartService {
         userId: string;
     }>;
     updateCartItem(userId: string, itemId: string, dto: UpdateCartItemDto): Promise<{
+        subTotal: number;
+        totalAmount: number;
+        discountAmount: number;
+        appliedPromotions: any[];
         items: ({
             sku: {
                 product: {
@@ -203,7 +215,6 @@ export declare class CartService {
             quantity: number;
             cartId: string;
         })[];
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -211,6 +222,10 @@ export declare class CartService {
         userId: string;
     }>;
     removeCartItem(userId: string, itemId: string): Promise<{
+        subTotal: number;
+        totalAmount: number;
+        discountAmount: number;
+        appliedPromotions: any[];
         items: ({
             sku: {
                 product: {
@@ -271,7 +286,6 @@ export declare class CartService {
             quantity: number;
             cartId: string;
         })[];
-    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;

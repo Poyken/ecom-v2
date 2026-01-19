@@ -3,7 +3,7 @@ import type { CreateOrderDto, UpdateOrderStatusDto } from '@ecommerce/shared';
 export declare class OrdersController {
     private readonly ordersService;
     constructor(ordersService: OrdersService);
-    create(req: any, createOrderDto: CreateOrderDto): Promise<{
+    create(createOrderDto: CreateOrderDto): Promise<{
         id: string;
         deletedAt: Date | null;
         createdAt: Date;
@@ -13,7 +13,9 @@ export declare class OrdersController {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;
@@ -60,7 +62,9 @@ export declare class OrdersController {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;
@@ -112,7 +116,9 @@ export declare class OrdersController {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;
@@ -191,7 +197,9 @@ export declare class OrdersController {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;
@@ -225,7 +233,9 @@ export declare class OrdersController {
         userId: string;
         addressId: string | null;
         paymentMethod: string | null;
+        subTotal: import("@prisma/client/runtime/library").Decimal;
         totalAmount: import("@prisma/client/runtime/library").Decimal;
+        discountAmount: import("@prisma/client/runtime/library").Decimal;
         shippingFee: import("@prisma/client/runtime/library").Decimal;
         recipientName: string;
         phoneNumber: string;

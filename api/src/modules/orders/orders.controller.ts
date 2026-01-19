@@ -14,8 +14,8 @@ export class OrdersController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(CreateOrderSchema))
-  create(@Request() req: any, @Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(req.user.id, createOrderDto);
+  async create(@Body() createOrderDto: CreateOrderDto) {
+    return this.ordersService.create(createOrderDto);
   }
 
   @Get()

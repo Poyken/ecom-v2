@@ -2,19 +2,21 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { ClsService } from 'nestjs-cls';
 import type { AddToCartDto, UpdateCartItemDto } from '@ecommerce/shared';
+import { PromotionsService } from '../promotions/promotions.service';
 
 @Injectable()
 export class CartService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cls: ClsService,
+    private readonly promotionsService: PromotionsService,
   ) {}
 
   private get tenantId() {
     return this.cls.get('TENANT_ID');
   }
 
-  async getCart(userId: string) {
+  async getCart(userId: string, voucherCode?: string) {
     let cart = await this.prisma.cart.findUnique({
       where: {
         userId_tenantId: {
@@ -47,7 +49,22 @@ export class CartService {
       });
     }
 
-    return cart;
+    // Calculate Discount
+    const items = cart.items || [];
+    let subTotal = 0;
+    items.forEach(item => {
+        subTotal += Number(item.sku.price) * item.quantity;
+    });
+
+    const promotionInfo = await this.promotionsService.calculateDiscount(items, subTotal, voucherCode);
+
+    return {
+        ...cart,
+        subTotal,
+        totalAmount: subTotal - promotionInfo.totalDiscount,
+        discountAmount: promotionInfo.totalDiscount,
+        appliedPromotions: promotionInfo.appliedPromos
+    };
   }
 
   async addToCart(userId: string, addToCartDto: AddToCartDto) {

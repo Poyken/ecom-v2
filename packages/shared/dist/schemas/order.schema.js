@@ -4,7 +4,8 @@ exports.UpdateOrderStatusSchema = exports.CreateOrderSchema = void 0;
 const zod_1 = require("zod");
 exports.CreateOrderSchema = zod_1.z.object({
     addressId: zod_1.z.string().uuid().optional(),
-    paymentMethod: zod_1.z.enum(['COD', 'BANK_TRANSFER']).default('COD'),
+    paymentMethod: zod_1.z.enum(['COD', 'BANK_TRANSFER', 'STRIPE', 'PAYPAL']),
+    voucherCode: zod_1.z.string().optional(),
     note: zod_1.z.string().optional(),
 });
 exports.UpdateOrderStatusSchema = zod_1.z.object({

@@ -13,17 +13,20 @@ exports.CartService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../common/prisma/prisma.service");
 const nestjs_cls_1 = require("nestjs-cls");
+const promotions_service_1 = require("../promotions/promotions.service");
 let CartService = class CartService {
     prisma;
     cls;
-    constructor(prisma, cls) {
+    promotionsService;
+    constructor(prisma, cls, promotionsService) {
         this.prisma = prisma;
         this.cls = cls;
+        this.promotionsService = promotionsService;
     }
     get tenantId() {
         return this.cls.get('TENANT_ID');
     }
-    async getCart(userId) {
+    async getCart(userId, voucherCode) {
         let cart = await this.prisma.cart.findUnique({
             where: {
                 userId_tenantId: {
@@ -54,7 +57,19 @@ let CartService = class CartService {
                 include: { items: { include: { sku: { include: { product: true, optionValues: { include: { optionValue: true } } } } } } }
             });
         }
-        return cart;
+        const items = cart.items || [];
+        let subTotal = 0;
+        items.forEach(item => {
+            subTotal += Number(item.sku.price) * item.quantity;
+        });
+        const promotionInfo = await this.promotionsService.calculateDiscount(items, subTotal, voucherCode);
+        return {
+            ...cart,
+            subTotal,
+            totalAmount: subTotal - promotionInfo.totalDiscount,
+            discountAmount: promotionInfo.totalDiscount,
+            appliedPromotions: promotionInfo.appliedPromos
+        };
     }
     async addToCart(userId, addToCartDto) {
         const { skuId, quantity } = addToCartDto;
@@ -141,6 +156,7 @@ exports.CartService = CartService;
 exports.CartService = CartService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        nestjs_cls_1.ClsService])
+        nestjs_cls_1.ClsService,
+        promotions_service_1.PromotionsService])
 ], CartService);
 //# sourceMappingURL=cart.service.js.map

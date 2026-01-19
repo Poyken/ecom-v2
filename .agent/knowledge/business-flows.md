@@ -92,15 +92,20 @@ Hỗ trợ Multi-Warehouse:
 
 ### 4.1 Advanced Promotions
 
-- **Conditions**:
-  - Min Order Value.
-  - Specific Product/Category/Brand.
-  - Customer Group (VIP only).
-  - Usage Limit (Per user / Total).
-- **Actions**:
-  - Percentage Off.
-  - Fixed Amount Off.
-  - Buy X Get Y.
+- **Loại hình Khuyến mãi**:
+  - **Automatic**: Tự động áp dụng khi thỏa mãn điều kiện (Rules).
+  - **Voucher/Coupon**: Phải nhập mã code chính xác để kích hoạt.
+- **Điều kiện (Rules)**:
+  - Giá trị đơn hàng tối thiểu (Min Order Value).
+  - Áp dụng cho Sản phẩm/Danh mục/Thương hiệu cụ thể.
+- **Hành động (Actions)**:
+  - Giảm giá theo % (kèm mức giảm tối đa - Max Cap).
+  - Giảm giá số tiền cố định.
+  - Miễn phí vận chuyển (Free Shipping).
+- **Cơ chế Ưu tiên (Priority)**:
+  - Hệ thống tự động chọn Khuyến mãi có độ ưu tiên (Priority) cao nhất và giá trị giảm lớn nhất để áp dụng, tránh việc cộng dồn sai quy định.
+- **Giới hạn sử dụng (Usage Limit)**:
+  - Mỗi Khuyến mãi có tổng giới hạn lượt dùng và được lưu log chi tiết trong bảng `PromotionUsage`.
 
 ### 4.2 Loyalty System
 

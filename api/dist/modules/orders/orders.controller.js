@@ -25,8 +25,8 @@ let OrdersController = class OrdersController {
     constructor(ordersService) {
         this.ordersService = ordersService;
     }
-    create(req, createOrderDto) {
-        return this.ordersService.create(req.user.id, createOrderDto);
+    async create(createOrderDto) {
+        return this.ordersService.create(createOrderDto);
     }
     findAll(req) {
         return this.ordersService.findAll(req.user.id);
@@ -45,11 +45,10 @@ exports.OrdersController = OrdersController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new zod_validation_pipe_1.ZodValidationPipe(shared_1.CreateOrderSchema)),
-    __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Body)()),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
