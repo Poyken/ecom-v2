@@ -21,22 +21,23 @@ Tài liệu này chứa toàn bộ thông tin về Tech Stack, dependencies và 
 | `@nestjs/schedule`      | 6.x     | Cron Jobs                          |
 | `@nestjs/websockets`    | 11.x    | Real-time                          |
 | `@nestjs/cache-manager` | 3.x     | Caching                            |
+| `nestjs-cls`            | 4.x     | Tenant Context Storage             |
 
 ### Database & ORM
 
 | Package          | Version | Mục đích        |
 | ---------------- | ------- | --------------- |
-| `prisma`         | 6.x     | ORM CLI         |
-| `@prisma/client` | 6.x     | Database Client |
+| `prisma`         | 5.22.0  | ORM CLI         |
+| `@prisma/client` | 5.22.0  | Database Client |
 | `ioredis`        | 5.x     | Redis Client    |
 
-### Validation (⚠️ CẦN TỐI ƯU)
+### Validation (Zod-First Standard)
 
-| Package           | Status    | Khuyến nghị                 |
-| ----------------- | --------- | --------------------------- |
-| `joi`             | Đang dùng | ❌ Loại bỏ, chuyển sang Zod |
-| `class-validator` | Đang dùng | ❌ Loại bỏ, chuyển sang Zod |
-| `zod`             | 4.x       | ✅ Dùng làm chuẩn duy nhất  |
+| Package           | Status     | Khuyến nghị                 |
+| ----------------- | ---------- | --------------------------- |
+| `joi`             | ❌ REMOVED | Đã loại bỏ hoàn toàn        |
+| `class-validator` | ❌ REMOVED | Đã loại bỏ hoàn toàn        |
+| `zod`             | 3.x        | ✅ Chuẩn duy nhất API + Web |
 
 ### Utilities
 

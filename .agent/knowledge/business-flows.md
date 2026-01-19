@@ -1,144 +1,136 @@
-# Business Flows Reference
+# Business Flows Reference (Enterprise Edition)
 
-Tài liệu này mô tả các luồng nghiệp vụ chính của hệ thống Ecommerce.
-
----
-
-## 1. Customer Journey
-
-```
-┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-│  Browse  │ → │   Cart   │ → │ Checkout │ → │  Payment │ → │  Order   │
-└──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
-     │                                               │               │
-     ▼                                               ▼               ▼
-┌──────────┐                                  ┌──────────┐    ┌──────────┐
-│  Review  │                                  │   Fail   │    │ Shipping │
-└──────────┘                                  └──────────┘    └──────────┘
-```
-
-### 1.1 Browse → Cart
-
-- User truy cập storefront (via Tenant subdomain/domain)
-- Duyệt Categories, Brands, Products
-- Filter theo Price, Rating
-- Thêm SKU vào Cart (gọi API `POST /cart/items`)
-
-### 1.2 Checkout Flow
-
-1. User click "Checkout"
-2. Chọn/Thêm Address
-3. Chọn Shipping Method (GHN/GHTK integration)
-4. Áp dụng Promotion Code (nếu có)
-5. Chọn Payment Method
-
-### 1.3 Payment Flow
-
-- **COD**: Tạo Order với status PENDING, payment UNPAID
-- **MOMO/VNPAY**: Redirect → Callback → Update Payment status
-- **Stripe**: Client-side → Confirm → Webhook → Update
-
-### 1.4 Order Fulfillment
-
-```
-PENDING → PROCESSING → SHIPPED → DELIVERED → COMPLETED
-                ↓
-           CANCELLED
-```
+Tài liệu này mô tả chi tiết các luồng nghiệp vụ của hệ thống Ecommerce 2.0 (Enterprise), tương ứng với `schema.prisma` mới.
 
 ---
 
-## 2. Admin Operations
+## 1. Multi-Tenancy & Auth Flow
 
-### 2.1 Catalog Management
+### 1.1 Tenant Resolution
 
-```
-Create Brand → Create Category → Create Product → Create SKUs → Upload Images
-                                      │
-                                      ▼
-                              Add ProductOptions (Color, Size)
-                                      │
-                                      ▼
-                              Create OptionValues (Red, Blue, S, M, L)
-                                      │
-                                      ▼
-                              Link SKUs to OptionValues
-```
+Mọi Request tới API đều phải xác định Context Tenant:
 
-### 2.2 Inventory Flow
+1.  **Public Storefront**: Dựa vào `Host` Header (Subdomain hoặc Custom Domain).
+    - `shop1.platform.com` -> Tenant A
+    - `mystore.com` (CNAME) -> Tenant A
+2.  **Platform Admin**: Dựa vào đường dẫn hoặc subdomain quản trị (`admin.platform.com`).
+3.  **API Requests**:
+    - Header `x-tenant-id`: Bắt buộc cho các tác vụ quản trị.
+    - Nếu thiếu -> Trả về 400 (Bad Request).
 
-```
-Create Warehouse → Create InventoryItem (SKU + Warehouse) → Set minStockLevel
-                                      │
-                     ┌────────────────┼────────────────┐
-                     ▼                ▼                ▼
-               PurchaseOrder    Sale (Order)     Manual Adjust
-                     │                │                │
-                     ▼                ▼                ▼
-               InventoryLog    InventoryLog     InventoryLog
-```
+### 1.2 User Roles & Hierarchy
 
-### 2.3 Promotion Setup
+Hệ thống hỗ trợ RBAC động (Dynamic Roles):
 
-```
-Create Promotion
-       │
-       ├── Add PromotionRules (MIN_ORDER_VALUE >= 500000)
-       │
-       └── Add PromotionActions (DISCOUNT_PERCENT: 10%)
-```
+- **Platform Owner**: Super Admin, quản lý toàn bộ hệ thống (Global Access).
+- **Tenant Owner**: Người tạo Store. Full quyền trong Tenant của họ.
+- **Staff**: Nhân viên, quyền hạn dựa trên bảng `UserPermission` liên kết với `UserRole`.
+- **Customer**: Khách mua hàng (B2C hoặc B2B).
+  - **B2C**: Khách lẻ.
+  - **B2B**: Thuộc `CustomerGroup`, có `PriceList` riêng.
 
 ---
 
-## 3. RMA (Return) Flow
+## 2. Catalog & Inventory (Advanced)
 
-```
-Customer Request     Admin Review      Return Process      Refund
-     │                    │                  │                │
-     ▼                    ▼                  ▼                ▼
-┌──────────┐      ┌──────────────┐    ┌───────────┐    ┌──────────┐
-│ PENDING  │  →   │  APPROVED/   │ →  │ RECEIVED  │ →  │ REFUNDED │
-│          │      │  REJECTED    │    │ INSPECTING│    │          │
-└──────────┘      └──────────────┘    └───────────┘    └──────────┘
-```
+### 2.1 Product Variants & Options
 
----
+Mô hình SKU-centric:
 
-## 4. Multi-Tenant Flow
+- **Product**: Chứa thông tin chung (Tên, Mô tả, Brand).
+- **ProductOption**: Định nghĩa thuộc tính (Size, Color).
+- **OptionValue**: Giá trị cụ thể (S, M, Red, Blue).
+- **SKU**: Biến thể cụ thể (Product A - Red - S).
+  - SKU liên kết N-N với `OptionValue`.
+  - SKU có giá riêng (`price`, `originalPrice`, `costPrice`).
 
-### Tenant Onboarding
+### 2.2 Inventory Management
 
-```
-1. User đăng ký tài khoản
-2. Tạo Tenant (subdomain, plan)
-3. Onboarding Wizard:
-   - Step 0: Thông tin cơ bản
-   - Step 1: Upload Logo
-   - Step 2: Cấu hình Shipping
-   - Step 3: Thêm Products đầu tiên
-   - Step 4: Kích hoạt Store
-```
+Hỗ trợ Multi-Warehouse:
 
-### Tenant Data Isolation
-
-- Mọi query PHẢI có `WHERE tenantId = ?`
-- Middleware tự động inject `tenantId` từ request context
-- Guards validate tenant access trước khi xử lý
+- Mỗi SKU có `InventoryItem` tại nhiều `Warehouse`.
+- **InventoryLog**: Ghi lại mọi biến động kho (Purchase, Sale, Return, Adjustment).
+- **Logic**:
+  - `Available Stock` = `OnHand` - `Committed` (Đang nằm trong đơn chưa ship).
+  - Khi order -> Tăng `Committed`.
+  - Khi ship -> Giảm `OnHand`, Giảm `Committed`.
 
 ---
 
-## 5. Loyalty Points Flow
+## 3. Order Processing & Fulfillment
 
-```
-Order Completed → Calculate Points (orderTotal / loyaltyPointRatio)
-                        │
-                        ▼
-                  LoyaltyPoint (type: EARNED)
-                        │
-         ┌──────────────┴──────────────┐
-         ▼                             ▼
-   Redeem at Checkout           Points Expire
-         │                             │
-         ▼                             ▼
-   LoyaltyPoint (REDEEMED)      Auto cleanup job
-```
+### 3.1 Checkout Flow (Enterprise)
+
+1.  **Cart Calculation**:
+    - Tính tổng tiền hàng.
+    - **Promotion Engine**: Check `PromotionRules` -> Apply `PromotionActions` (Discount Item, Discount Order, Free Shipping).
+    - **Tax Engine**: Tính thuế theo `Region` và `TaxRate`.
+    - **Tiered Pricing**: Nếu là B2B Customer, áp dụng giá từ `PriceList` thay vì giá niêm yết.
+2.  **Place Order**:
+    - Tạo `Order` (Status: PENDING).
+    - Tạo `OrderLineItem` (Snapshot giá và discount tại thời điểm mua).
+    - Khóa tồn kho (Inventory Commitment).
+3.  **Payment**:
+    - Tạo `Payment` record.
+    - Tích hợp Stripe/PayPal/Momo.
+
+### 3.2 Fulfillment & Shipping
+
+- **Split Shipments**: Một Order có thể tách thành nhiều `Fulfillment` (Giao nhiều lần/từ nhiều kho).
+- **Routing**: Chọn kho gần nhất để fulfill (Future Phase).
+
+### 3.3 Returns (RMA)
+
+- User request `ReturnRequest`.
+- Admin duyệt -> `APPROVED`.
+- Hàng về kho -> Update `InventoryLog` (Type: `RETURN`).
+- Refund tiền -> Update `Wallet` hoặc hoàn tiền qua Gateway.
+
+---
+
+## 4. Marketing & Loyalty
+
+### 4.1 Advanced Promotions
+
+- **Conditions**:
+  - Min Order Value.
+  - Specific Product/Category/Brand.
+  - Customer Group (VIP only).
+  - Usage Limit (Per user / Total).
+- **Actions**:
+  - Percentage Off.
+  - Fixed Amount Off.
+  - Buy X Get Y.
+
+### 4.2 Loyalty System
+
+- **Earning**: Tỷ lệ tích điểm cấu hình theo `TenantSettings`.
+- **Tier**: Hạng thành viên (Silver, Gold) dựa trên tổng chi tiêu.
+- **Redemption**: Dùng điểm đổi voucher hoặc trừ trực tiếp vào đơn hàng.
+
+---
+
+## 5. AI & Automation (RAG)
+
+### 5.1 AI Chat Assistant
+
+- **Embedding**: Sync Product/Blog data vào Vector DB (pgvector) qua bảng `ProductEmbedding`.
+- **Flow**:
+  1.  User hỏi "Tìm giày chạy bộ màu đỏ dưới 1 triệu".
+  2.  System embed query -> Search pgvector.
+  3.  LLM rerank kết quả -> Trả lời User.
+  4.  Lưu history vào `AiChatSession` và `AiChatMessage`.
+
+### 5.2 Insight & Analytics
+
+- Phân tích hành vi User qua `UserBehaviorLog`.
+- Gợi ý sản phẩm (Recommendation Engine).
+
+---
+
+## 6. Subscription (SaaS for Tenant)
+
+- **SubscriptionPlan**: Gói dịch vụ (Free, Pro, Enterprise).
+- **Subscription**: Tenant đăng ký gói.
+- **Limits**: Giới hạn số lượng Product, Staff, Storage theo gói.
+- **Billing**: Thu phí Tenant định kỳ.

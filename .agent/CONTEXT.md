@@ -10,9 +10,9 @@ Tài liệu này là **Long-term Memory** của dự án. Cập nhật khi có q
 
 **Tech Stack**:
 
-- **Backend**: NestJS 11, Prisma 6, PostgreSQL (+pgvector), Redis, BullMQ
+- **Backend**: NestJS 11, Prisma 5.22, PostgreSQL (+pgvector), Redis 7 (Upstash ready)
 - **Frontend**: Next.js 16, React 19, TailwindCSS 4, Zustand, SWR
-- **Infrastructure**: Docker Compose (Postgres, Redis, API x2, Web, Worker)
+- **Infrastructure**: Docker Compose (Postgres, Redis, API x2, Web, Worker), Monorepo (pnpm)
 
 ---
 
@@ -70,7 +70,7 @@ Tài liệu này là **Long-term Memory** của dự án. Cập nhật khi có q
 ## 4. Quyết định Kiến trúc (ADR)
 
 - **ADR-001**: Sử dụng **Multi-tenant với Shared Database** (mỗi table có `tenantId`).
-- **ADR-002**: Dùng **Prisma** làm ORM duy nhất, enable `fullTextSearchPostgres`.
+- **ADR-002**: Dùng **Prisma** làm ORM duy nhất, enable `fullTextSearchPostgres` (v5 compat).
 - **ADR-003**: **Domain Events** qua `@nestjs/event-emitter` (trong `DomainEventsModule`).
 - **ADR-004**: **Soft Delete** cho mọi entity quan trọng (User, Product, Order, Tenant).
 - **ADR-005**: API Scalable với Docker Compose `replicas: 2`.
@@ -83,6 +83,7 @@ Tài liệu này là **Long-term Memory** của dự án. Cập nhật khi có q
   - **ISR (Incremental)**: Product Detail, Blog Post, Public Category Pages (Revalidate: 60s).
   - **SSR (Server)**: User Profile, Cart, Checkout, Order History (Dynamic Data).
   - **CSR (Client)**: Admin Dashboard, Complex Interactive Forms (use `use client` + SWR).
+- **ADR-011**: **Tenant Context**: Dùng `nestjs-cls` để lưu `tenantId`. Prisma Middleware tự động inject `where: { tenantId }`.
 
 ---
 
@@ -91,6 +92,7 @@ Tài liệu này là **Long-term Memory** của dự án. Cập nhật khi có q
 | Module                                         | Chức năng                           |
 | ---------------------------------------------- | ----------------------------------- |
 | `auth`                                         | Đăng nhập, Đăng ký, OAuth, 2FA, JWT |
+| `common/tenancy`                               | Tenant Middleware, CLS Service      |
 | `users`                                        | CRUD User, Profile                  |
 | `tenants`                                      | CRUD Tenant, Settings, Onboarding   |
 | `catalog` (categories, brands, products, skus) | Quản lý sản phẩm                    |
@@ -156,3 +158,9 @@ Tài liệu này là **Long-term Memory** của dự án. Cập nhật khi có q
   - Shared Package created & linked.
   - NestJS API & Next.js Web Scaffolded.
   - Verified via full build.
+
+- [2026-01-19] **Phase 1-3 Audit completed (Score 10/10)**:
+  - **Prisma Enterprise Schema** fully migrated.
+  - **Auth & Tenancy**: Implemented Secure JWT + Middleware Isolation.
+  - **Prevention Rules**: Added `lessons-learned.md`.
+  - **Business Flows**: Updated for Enterprise logic.
