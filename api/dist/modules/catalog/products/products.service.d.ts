@@ -1,10 +1,12 @@
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { ClsService } from 'nestjs-cls';
 import type { CreateProductDto, UpdateProductDto } from '@ecommerce/shared';
+import { AiService } from '../../ai/ai.service';
 export declare class ProductsService {
     private readonly prisma;
     private readonly cls;
-    constructor(prisma: PrismaService, cls: ClsService);
+    private readonly aiService;
+    constructor(prisma: PrismaService, cls: ClsService, aiService: AiService);
     private get tenantId();
     create(createProductDto: CreateProductDto): Promise<any>;
     findAll(): Promise<({

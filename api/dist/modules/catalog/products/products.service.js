@@ -17,12 +17,15 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../../common/prisma/prisma.service");
 const nestjs_cls_1 = require("nestjs-cls");
 const slugify_1 = __importDefault(require("slugify"));
+const ai_service_1 = require("../../ai/ai.service");
 let ProductsService = class ProductsService {
     prisma;
     cls;
-    constructor(prisma, cls) {
+    aiService;
+    constructor(prisma, cls, aiService) {
         this.prisma = prisma;
         this.cls = cls;
+        this.aiService = aiService;
     }
     get tenantId() {
         return this.cls.get('TENANT_ID');
@@ -51,6 +54,7 @@ let ProductsService = class ProductsService {
                     }
                 }
             });
+            this.aiService.syncProductEmbedding(product.id).catch(e => { });
             const createdOptionValues = {};
             if (options && options.length > 0) {
                 for (const opt of options) {
@@ -145,10 +149,12 @@ let ProductsService = class ProductsService {
                 data.slug = uniqueSlug;
             }
         }
-        return this.prisma.product.update({
+        const result = await this.prisma.product.update({
             where: { id },
             data
         });
+        this.aiService.syncProductEmbedding(id).catch(e => { });
+        return result;
     }
     async remove(id) {
         return this.prisma.product.update({
@@ -171,6 +177,7 @@ exports.ProductsService = ProductsService;
 exports.ProductsService = ProductsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        nestjs_cls_1.ClsService])
+        nestjs_cls_1.ClsService,
+        ai_service_1.AiService])
 ], ProductsService);
 //# sourceMappingURL=products.service.js.map

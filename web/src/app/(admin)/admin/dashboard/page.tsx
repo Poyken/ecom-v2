@@ -4,8 +4,10 @@ import AnalyticsDashboardClient from "./AnalyticsDashboardClient";
 export default async function AdminDashboardPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
   const { range = '7d' } = await searchParams;
   
-  const analytics = await apiFetch(`/analytics/overview?range=${range}`);
-  const topProducts = await apiFetch(`/analytics/top-products`);
+  const [analytics, topProducts] = await Promise.all([
+    apiFetch(`/analytics/overview?range=${range}`),
+    apiFetch(`/analytics/top-products`)
+  ]);
 
   return (
     <AnalyticsDashboardClient 

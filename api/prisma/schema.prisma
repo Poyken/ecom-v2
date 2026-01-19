@@ -313,6 +313,7 @@ model Product {
   reviews      Review[]
   skus         Sku[]
   wishlists    Wishlist[]
+  embedding    Unsupported("vector(768)")?
 
   // Multi-tenancy
   tenantId String
@@ -336,6 +337,7 @@ model Product {
   @@index([tenantId, brandId, deletedAt])
   @@index([tenantId, minPrice, maxPrice, deletedAt])
   @@index([tenantId, deletedAt, createdAt])
+  @@index([embedding], map: "idx_product_embedding")
 }
 
 model ProductToCategory {

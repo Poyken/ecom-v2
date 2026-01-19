@@ -12,6 +12,7 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 import { validate } from './common/config/config.schema';
 import { CartModule } from './modules/cart/cart.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { AiModule } from './modules/ai/ai.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { PaymentsModule } from './modules/payments/payments.module';
@@ -35,6 +36,7 @@ import { PromotionsModule } from './modules/promotions/promotions.module';
     CatalogModule,
     CartModule,
     OrdersModule,
+    AiModule,
     InventoryModule,
     AnalyticsModule,
     PaymentsModule,

@@ -84,6 +84,11 @@
   - Dashboard Admin đồng bộ thời gian thực với biểu đồ Recharts (Client-side rendering).
   - Xử lý lỗi SSR triệt để trên Next.js 16.
 
+- [2026-01-19] **Phase 14: AI Chat & Personalization completed**:
+  - Tích hợp **Google Gemini** và **pgvector** cho Semantic Search (RAG).
+  - Cơ chế Embedding tự động khi tạo/sửa sản phẩm.
+  - Floating Chat Widget trên Storefront với gợi ý sản phẩm thông minh.
+
 ## 5. Lộ trình Phát triển Tiếp theo (Roadmap)
 
 Hệ thống đang tiến vào giai đoạn Enterprise nâng cao với trọng tâm là Dữ liệu và Trí tuệ nhân tạo:

@@ -19,47 +19,53 @@ interface Props {
   range: string;
 }
 
+import { useMemo } from 'react';
+
+// ... (imports)
+
 export default function AnalyticsDashboardClient({ stats, chartData, topProducts, range }: Props) {
-  const calculateChange = (current: number, previous: number) => {
-    if (previous === 0) return current > 0 ? 100 : 0;
-    return ((current - previous) / previous) * 100;
-  };
+  const kpis = useMemo(() => {
+    const calculateChange = (current: number, previous: number) => {
+        if (previous === 0) return current > 0 ? 100 : 0;
+        return ((current - previous) / previous) * 100;
+    };
 
-  const revenueChange = calculateChange(stats.revenue.current, stats.revenue.previous);
-  const ordersChange = calculateChange(stats.orders.current, stats.orders.previous);
-  const aovChange = calculateChange(stats.aov.current, stats.aov.previous);
+    const revenueChange = calculateChange(stats.revenue.current, stats.revenue.previous);
+    const ordersChange = calculateChange(stats.orders.current, stats.orders.previous);
+    const aovChange = calculateChange(stats.aov.current, stats.aov.previous);
 
-  const kpis = [
-    { 
-      label: 'Revenue', 
-      value: `$${stats.revenue.current.toLocaleString()}`, 
-      change: revenueChange, 
-      icon: DollarSign,
-      color: 'text-emerald-500' 
-    },
-    { 
-      label: 'Orders', 
-      value: stats.orders.current.toString(), 
-      change: ordersChange, 
-      icon: ShoppingBag,
-      color: 'text-blue-500' 
-    },
-    { 
-      label: 'AOV', 
-      value: `$${stats.aov.current.toFixed(2)}`, 
-      change: aovChange, 
-      icon: TrendingUp,
-      color: 'text-purple-500' 
-    },
-    { 
-      label: 'New Customers', 
-      value: stats.customers.toString(), 
-      change: 0, 
-      icon: Users,
-      color: 'text-orange-500',
-      noChange: true
-    },
-  ];
+    return [
+        { 
+        label: 'Revenue', 
+        value: `$${stats.revenue.current.toLocaleString()}`, 
+        change: revenueChange, 
+        icon: DollarSign,
+        color: 'text-emerald-500' 
+        },
+        { 
+        label: 'Orders', 
+        value: stats.orders.current.toString(), 
+        change: ordersChange, 
+        icon: ShoppingBag,
+        color: 'text-blue-500' 
+        },
+        { 
+        label: 'AOV', 
+        value: `$${stats.aov.current.toFixed(2)}`, 
+        change: aovChange, 
+        icon: TrendingUp,
+        color: 'text-purple-500' 
+        },
+        { 
+        label: 'New Customers', 
+        value: stats.customers.toString(), 
+        change: 0, 
+        icon: Users,
+        color: 'text-orange-500',
+        noChange: true
+        },
+    ];
+  }, [stats]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">

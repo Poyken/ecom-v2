@@ -12,12 +12,14 @@ const categories_module_1 = require("./categories/categories.module");
 const brands_module_1 = require("./brands/brands.module");
 const products_module_1 = require("./products/products.module");
 const skus_module_1 = require("./skus/skus.module");
+const prisma_module_1 = require("../../common/prisma/prisma.module");
+const ai_module_1 = require("../ai/ai.module");
 let CatalogModule = class CatalogModule {
 };
 exports.CatalogModule = CatalogModule;
 exports.CatalogModule = CatalogModule = __decorate([
     (0, common_1.Module)({
-        imports: [categories_module_1.CategoriesModule, brands_module_1.BrandsModule, products_module_1.ProductsModule, skus_module_1.SkusModule]
+        imports: [categories_module_1.CategoriesModule, brands_module_1.BrandsModule, products_module_1.ProductsModule, skus_module_1.SkusModule, prisma_module_1.PrismaModule, ai_module_1.AiModule]
     })
 ], CatalogModule);
 //# sourceMappingURL=catalog.module.js.map

@@ -3,12 +3,14 @@ import { PrismaService } from '../../../common/prisma/prisma.service';
 import { ClsService } from 'nestjs-cls';
 import slugify from 'slugify';
 import type { CreateProductDto, UpdateProductDto } from '@ecommerce/shared';
+import { AiService } from '../../ai/ai.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cls: ClsService,
+    private readonly aiService: AiService,
   ) {}
 
   private get tenantId() {
@@ -43,7 +45,10 @@ export class ProductsService {
             }
         });
 
-        const createdOptionValues: Record<string, string> = {}; // "Color:Red" -> ID
+        // Trigger AI Sync in background (don't await to keep response fast)
+        this.aiService.syncProductEmbedding(product.id).catch(e => {});
+
+        const createdOptionValues: Record<string, string> = {}; 
 
         // Create Options if provided
         if (options && options.length > 0) {
@@ -156,10 +161,13 @@ export class ProductsService {
             }
         }
 
-      return this.prisma.product.update({
+      const result = await this.prisma.product.update({
           where: { id },
           data
       });
+
+      this.aiService.syncProductEmbedding(id).catch(e => {});
+      return result;
       
       // TODO: Handle categoryIds update if needed (delete many -> create many)
   }

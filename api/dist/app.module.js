@@ -21,6 +21,7 @@ const transform_interceptor_1 = require("./common/interceptors/transform.interce
 const config_schema_1 = require("./common/config/config.schema");
 const cart_module_1 = require("./modules/cart/cart.module");
 const orders_module_1 = require("./modules/orders/orders.module");
+const ai_module_1 = require("./modules/ai/ai.module");
 const inventory_module_1 = require("./modules/inventory/inventory.module");
 const analytics_module_1 = require("./modules/analytics/analytics.module");
 const payments_module_1 = require("./modules/payments/payments.module");
@@ -52,6 +53,7 @@ exports.AppModule = AppModule = __decorate([
             catalog_module_1.CatalogModule,
             cart_module_1.CartModule,
             orders_module_1.OrdersModule,
+            ai_module_1.AiModule,
             inventory_module_1.InventoryModule,
             analytics_module_1.AnalyticsModule,
             payments_module_1.PaymentsModule,

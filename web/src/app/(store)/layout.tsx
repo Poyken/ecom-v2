@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import Link from 'next/link';
 import CartCounter from '@/components/store/CartCounter';
 import { VibrantButton } from '@/components/ui/VibrantButton';
+import ChatWidget from "@/components/ai/ChatWidget";
 
 export default function StoreLayout({
   children,
@@ -38,6 +40,7 @@ export default function StoreLayout({
           © {new Date().getFullYear()} Poyken. All rights reserved.
         </div>
       </footer>
+      <ChatWidget />
     </div>
   );
 }
