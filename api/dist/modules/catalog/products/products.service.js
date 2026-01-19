@@ -51,9 +51,10 @@ let ProductsService = class ProductsService {
                     }
                 }
             });
+            const createdOptionValues = {};
             if (options && options.length > 0) {
                 for (const opt of options) {
-                    await tx.productOption.create({
+                    const createdOpt = await tx.productOption.create({
                         data: {
                             name: opt.name,
                             productId: product.id,
@@ -62,6 +63,28 @@ let ProductsService = class ProductsService {
                                 create: opt.values.map(val => ({
                                     value: val,
                                     tenantId: this.tenantId,
+                                }))
+                            }
+                        },
+                        include: { values: true }
+                    });
+                    createdOpt.values.forEach((v) => {
+                        createdOptionValues[`${createdOpt.name}:${v.value}`] = v.id;
+                    });
+                }
+            }
+            if (createProductDto.skus && createProductDto.skus.length > 0) {
+                for (const sku of createProductDto.skus) {
+                    await tx.sKU.create({
+                        data: {
+                            productId: product.id,
+                            price: sku.price,
+                            stock: sku.stock,
+                            tenantId: this.tenantId,
+                            optionValues: {
+                                create: sku.optionValues.map((ov) => ({
+                                    productOptionValueId: createdOptionValues[`${ov.optionName}:${ov.value}`],
+                                    tenantId: this.tenantId
                                 }))
                             }
                         }
@@ -81,7 +104,26 @@ let ProductsService = class ProductsService {
     async findOne(id) {
         const product = await this.prisma.product.findUnique({
             where: { id, tenantId: this.tenantId },
-            include: { brand: true, categories: true, options: { include: { values: true } }, skus: true },
+            include: {
+                brand: true,
+                categories: { include: { category: true } },
+                options: { include: { values: true } },
+                skus: { include: { optionValues: { include: { optionValue: { include: { option: true } } } } } }
+            },
+        });
+        if (!product)
+            throw new common_1.BadRequestException('Product not found');
+        return product;
+    }
+    async findBySlug(slug) {
+        const product = await this.prisma.product.findFirst({
+            where: { slug, tenantId: this.tenantId },
+            include: {
+                brand: true,
+                categories: { include: { category: true } },
+                options: { include: { values: true } },
+                skus: { include: { optionValues: { include: { optionValue: { include: { option: true } } } } } }
+            },
         });
         if (!product)
             throw new common_1.BadRequestException('Product not found');

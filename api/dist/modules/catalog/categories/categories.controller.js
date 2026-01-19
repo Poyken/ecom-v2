@@ -15,6 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CategoriesController = void 0;
 const common_1 = require("@nestjs/common");
 const categories_service_1 = require("./categories.service");
+const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
+const roles_guard_1 = require("../../../common/guards/roles.guard");
+const roles_decorator_1 = require("../../../common/decorators/roles.decorator");
 const shared_1 = require("@ecommerce/shared");
 const zod_validation_pipe_1 = require("../../../common/pipes/zod-validation.pipe");
 let CategoriesController = class CategoriesController {
@@ -41,6 +44,8 @@ let CategoriesController = class CategoriesController {
 exports.CategoriesController = CategoriesController;
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
     (0, common_1.UsePipes)(new zod_validation_pipe_1.ZodValidationPipe(shared_1.CreateCategorySchema)),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -62,6 +67,8 @@ __decorate([
 ], CategoriesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
     (0, common_1.UsePipes)(new zod_validation_pipe_1.ZodValidationPipe(shared_1.UpdateCategorySchema)),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -71,6 +78,8 @@ __decorate([
 ], CategoriesController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

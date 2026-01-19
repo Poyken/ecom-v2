@@ -16,6 +16,8 @@ exports.InventoryController = void 0;
 const common_1 = require("@nestjs/common");
 const inventory_service_1 = require("./inventory.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const roles_guard_1 = require("../../common/guards/roles.guard");
+const roles_decorator_1 = require("../../common/decorators/roles.decorator");
 const shared_1 = require("@ecommerce/shared");
 const zod_validation_pipe_1 = require("../../common/pipes/zod-validation.pipe");
 let InventoryController = class InventoryController {
@@ -29,6 +31,10 @@ let InventoryController = class InventoryController {
     adjustStock(skuId, dto) {
         return this.inventoryService.adjustStock(skuId, dto);
     }
+    transferStock(skuId, dto) {
+        const { fromWarehouseId, toWarehouseId, quantity, reason } = dto;
+        return this.inventoryService.transferStock(skuId, fromWarehouseId, toWarehouseId, quantity, reason);
+    }
 };
 exports.InventoryController = InventoryController;
 __decorate([
@@ -40,6 +46,7 @@ __decorate([
 ], InventoryController.prototype, "getAvailableStock", null);
 __decorate([
     (0, common_1.Post)('adjust/:skuId'),
+    (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
     (0, common_1.UsePipes)(new zod_validation_pipe_1.ZodValidationPipe(shared_1.AdjustInventorySchema)),
     __param(0, (0, common_1.Param)('skuId')),
     __param(1, (0, common_1.Body)()),
@@ -47,9 +54,19 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "adjustStock", null);
+__decorate([
+    (0, common_1.Post)('transfer/:skuId'),
+    (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
+    (0, common_1.UsePipes)(new zod_validation_pipe_1.ZodValidationPipe(shared_1.TransferInventorySchema)),
+    __param(0, (0, common_1.Param)('skuId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], InventoryController.prototype, "transferStock", null);
 exports.InventoryController = InventoryController = __decorate([
     (0, common_1.Controller)('inventory'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [inventory_service_1.InventoryService])
 ], InventoryController);
 //# sourceMappingURL=inventory.controller.js.map

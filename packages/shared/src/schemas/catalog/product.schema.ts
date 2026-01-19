@@ -6,19 +6,25 @@ export const ProductOptionSchema = z.object({
 });
 
 export const CreateProductSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  description: z.string().optional(),
+  name: z.string().min(1),
   brandId: z.string().uuid(),
   categoryIds: z.array(z.string().uuid()),
-  
+  description: z.string().optional(),
+  metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
-  metaTitle: z.string().optional(),
-  
-  price: z.number().min(0).optional(), // Base price for simple products or display
-  
-  // Optional: Create options immediately
-  options: z.array(ProductOptionSchema).optional(),
+  options: z.array(z.object({
+    name: z.string(),
+    values: z.array(z.string())
+  })).optional(),
+  skus: z.array(z.object({
+    price: z.number(),
+    stock: z.number(),
+    optionValues: z.array(z.object({
+      optionName: z.string(),
+      value: z.string()
+    }))
+  })).optional()
 });
 
 export const UpdateProductSchema = CreateProductSchema.partial();

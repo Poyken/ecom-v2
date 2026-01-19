@@ -6,26 +6,7 @@ export declare class ProductsService {
     private readonly cls;
     constructor(prisma: PrismaService, cls: ClsService);
     private get tenantId();
-    create(createProductDto: CreateProductDto): Promise<{
-        id: string;
-        name: string;
-        deletedAt: Date | null;
-        createdAt: Date;
-        updatedAt: Date;
-        tenantId: string;
-        description: string | null;
-        metaDescription: string | null;
-        metaKeywords: string | null;
-        metaTitle: string | null;
-        slug: string;
-        brandId: string;
-        metadata: import("@prisma/client/runtime/library").JsonValue | null;
-        maxPrice: import("@prisma/client/runtime/library").Decimal | null;
-        minPrice: import("@prisma/client/runtime/library").Decimal | null;
-        avgRating: number | null;
-        reviewCount: number;
-        commissionRate: import("@prisma/client/runtime/library").Decimal;
-    }>;
+    create(createProductDto: CreateProductDto): Promise<any>;
     findAll(): Promise<({
         brand: {
             id: string;
@@ -40,8 +21,8 @@ export declare class ProductsService {
         };
         categories: {
             tenantId: string;
-            categoryId: string;
             productId: string;
+            categoryId: string;
         }[];
         options: ({
             values: {
@@ -56,8 +37,8 @@ export declare class ProductsService {
             id: string;
             name: string;
             tenantId: string;
-            displayOrder: number | null;
             productId: string;
+            displayOrder: number | null;
         })[];
     } & {
         id: string;
@@ -91,26 +72,65 @@ export declare class ProductsService {
             slug: string;
             imageUrl: string | null;
         };
-        categories: {
+        categories: ({
+            category: {
+                id: string;
+                name: string;
+                deletedAt: Date | null;
+                createdAt: Date;
+                updatedAt: Date;
+                tenantId: string;
+                metaDescription: string | null;
+                metaKeywords: string | null;
+                metaTitle: string | null;
+                imageId: string | null;
+                parentId: string | null;
+                slug: string;
+                imageUrl: string | null;
+            };
+        } & {
             tenantId: string;
-            categoryId: string;
             productId: string;
-        }[];
-        skus: {
+            categoryId: string;
+        })[];
+        skus: ({
+            optionValues: ({
+                optionValue: {
+                    option: {
+                        id: string;
+                        name: string;
+                        tenantId: string;
+                        productId: string;
+                        displayOrder: number | null;
+                    };
+                } & {
+                    id: string;
+                    value: string;
+                    tenantId: string;
+                    imageId: string | null;
+                    imageUrl: string | null;
+                    optionId: string;
+                };
+            } & {
+                tenantId: string;
+                skuId: string;
+                optionValueId: string;
+            })[];
+        } & {
             id: string;
             createdAt: Date;
             updatedAt: Date;
             status: string;
             tenantId: string;
             imageUrl: string | null;
-            price: import("@prisma/client/runtime/library").Decimal | null;
             metadata: import("@prisma/client/runtime/library").JsonValue | null;
             productId: string;
             skuCode: string;
+            price: import("@prisma/client/runtime/library").Decimal | null;
             salePrice: import("@prisma/client/runtime/library").Decimal | null;
             stock: number;
             reservedStock: number;
-        }[];
+        })[];
         options: ({
             values: {
                 id: string;
@@ -124,8 +144,115 @@ export declare class ProductsService {
             id: string;
             name: string;
             tenantId: string;
-            displayOrder: number | null;
             productId: string;
+            displayOrder: number | null;
+        })[];
+    } & {
+        id: string;
+        name: string;
+        deletedAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+        tenantId: string;
+        description: string | null;
+        metaDescription: string | null;
+        metaKeywords: string | null;
+        metaTitle: string | null;
+        slug: string;
+        brandId: string;
+        metadata: import("@prisma/client/runtime/library").JsonValue | null;
+        maxPrice: import("@prisma/client/runtime/library").Decimal | null;
+        minPrice: import("@prisma/client/runtime/library").Decimal | null;
+        avgRating: number | null;
+        reviewCount: number;
+        commissionRate: import("@prisma/client/runtime/library").Decimal;
+    }>;
+    findBySlug(slug: string): Promise<{
+        brand: {
+            id: string;
+            name: string;
+            deletedAt: Date | null;
+            createdAt: Date;
+            updatedAt: Date;
+            tenantId: string;
+            imageId: string | null;
+            slug: string;
+            imageUrl: string | null;
+        };
+        categories: ({
+            category: {
+                id: string;
+                name: string;
+                deletedAt: Date | null;
+                createdAt: Date;
+                updatedAt: Date;
+                tenantId: string;
+                metaDescription: string | null;
+                metaKeywords: string | null;
+                metaTitle: string | null;
+                imageId: string | null;
+                parentId: string | null;
+                slug: string;
+                imageUrl: string | null;
+            };
+        } & {
+            tenantId: string;
+            productId: string;
+            categoryId: string;
+        })[];
+        skus: ({
+            optionValues: ({
+                optionValue: {
+                    option: {
+                        id: string;
+                        name: string;
+                        tenantId: string;
+                        productId: string;
+                        displayOrder: number | null;
+                    };
+                } & {
+                    id: string;
+                    value: string;
+                    tenantId: string;
+                    imageId: string | null;
+                    imageUrl: string | null;
+                    optionId: string;
+                };
+            } & {
+                tenantId: string;
+                skuId: string;
+                optionValueId: string;
+            })[];
+        } & {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: string;
+            tenantId: string;
+            imageUrl: string | null;
+            metadata: import("@prisma/client/runtime/library").JsonValue | null;
+            productId: string;
+            skuCode: string;
+            price: import("@prisma/client/runtime/library").Decimal | null;
+            salePrice: import("@prisma/client/runtime/library").Decimal | null;
+            stock: number;
+            reservedStock: number;
+        })[];
+        options: ({
+            values: {
+                id: string;
+                value: string;
+                tenantId: string;
+                imageId: string | null;
+                imageUrl: string | null;
+                optionId: string;
+            }[];
+        } & {
+            id: string;
+            name: string;
+            tenantId: string;
+            productId: string;
+            displayOrder: number | null;
         })[];
     } & {
         id: string;

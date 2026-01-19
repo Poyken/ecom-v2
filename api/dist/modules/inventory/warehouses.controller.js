@@ -16,6 +16,8 @@ exports.WarehousesController = void 0;
 const common_1 = require("@nestjs/common");
 const inventory_service_1 = require("./inventory.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const roles_guard_1 = require("../../common/guards/roles.guard");
+const roles_decorator_1 = require("../../common/decorators/roles.decorator");
 const shared_1 = require("@ecommerce/shared");
 const zod_validation_pipe_1 = require("../../common/pipes/zod-validation.pipe");
 let WarehousesController = class WarehousesController {
@@ -28,6 +30,15 @@ let WarehousesController = class WarehousesController {
     }
     findAll() {
         return this.inventoryService.findAllWarehouses();
+    }
+    findOne(id) {
+        return this.inventoryService.findWarehouse(id);
+    }
+    getStock(id) {
+        return this.inventoryService.getWarehouseStock(id);
+    }
+    getLogs(id) {
+        return this.inventoryService.getWarehouseLogs(id);
     }
 };
 exports.WarehousesController = WarehousesController;
@@ -45,9 +56,31 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], WarehousesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], WarehousesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Get)(':id/stock'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], WarehousesController.prototype, "getStock", null);
+__decorate([
+    (0, common_1.Get)(':id/logs'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], WarehousesController.prototype, "getLogs", null);
 exports.WarehousesController = WarehousesController = __decorate([
     (0, common_1.Controller)('warehouses'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
     __metadata("design:paramtypes", [inventory_service_1.InventoryService])
 ], WarehousesController);
 //# sourceMappingURL=warehouses.controller.js.map

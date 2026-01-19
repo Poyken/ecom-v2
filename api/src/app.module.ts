@@ -15,6 +15,8 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 
+import { RolesGuard } from './common/guards/roles.guard';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -44,6 +46,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
     },
+    RolesGuard,
   ],
 })
 export class AppModule {

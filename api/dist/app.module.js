@@ -23,6 +23,7 @@ const cart_module_1 = require("./modules/cart/cart.module");
 const orders_module_1 = require("./modules/orders/orders.module");
 const inventory_module_1 = require("./modules/inventory/inventory.module");
 const payments_module_1 = require("./modules/payments/payments.module");
+const roles_guard_1 = require("./common/guards/roles.guard");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -61,6 +62,7 @@ exports.AppModule = AppModule = __decorate([
                 provide: core_1.APP_INTERCEPTOR,
                 useClass: transform_interceptor_1.TransformInterceptor,
             },
+            roles_guard_1.RolesGuard,
         ],
     })
 ], AppModule);

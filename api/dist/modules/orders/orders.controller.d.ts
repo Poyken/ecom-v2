@@ -90,8 +90,8 @@ export declare class OrdersController {
             createdAt: Date;
             updatedAt: Date;
             tenantId: string;
-            isDefault: boolean;
             userId: string;
+            isDefault: boolean;
             recipientName: string;
             phoneNumber: string;
             street: string;

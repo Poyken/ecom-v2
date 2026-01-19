@@ -15,11 +15,21 @@ export const InventoryParamSchema = z.object({
 
 export const AdjustInventorySchema = z.object({
   quantity: z.number().int(), // Can be negative
-  type: z.enum(['IMPORT', 'EXPORT', 'ADJUST', 'SALE', 'RETURN']),
+  type: z.enum(['IMPORT', 'EXPORT', 'ADJUST', 'SALE', 'RETURN', 'TRANSFER']),
   reason: z.string().optional(),
   warehouseId: z.string().uuid().optional(), // Target warehouse
+});
+
+
+export const TransferInventorySchema = z.object({
+  fromWarehouseId: z.string().uuid(),
+  toWarehouseId: z.string().uuid(),
+  quantity: z.number().int().positive(),
+  reason: z.string().optional(),
 });
 
 export type CreateWarehouseDto = z.infer<typeof CreateWarehouseSchema>;
 export type UpdateWarehouseDto = z.infer<typeof UpdateWarehouseSchema>;
 export type AdjustInventoryDto = z.infer<typeof AdjustInventorySchema>;
+export type TransferInventoryDto = z.infer<typeof TransferInventorySchema>;
+

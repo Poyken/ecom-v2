@@ -50,10 +50,10 @@ export declare class CartService {
                 status: string;
                 tenantId: string;
                 imageUrl: string | null;
-                price: import("@prisma/client/runtime/library").Decimal | null;
                 metadata: import("@prisma/client/runtime/library").JsonValue | null;
                 productId: string;
                 skuCode: string;
+                price: import("@prisma/client/runtime/library").Decimal | null;
                 salePrice: import("@prisma/client/runtime/library").Decimal | null;
                 stock: number;
                 reservedStock: number;
@@ -118,10 +118,10 @@ export declare class CartService {
                 status: string;
                 tenantId: string;
                 imageUrl: string | null;
-                price: import("@prisma/client/runtime/library").Decimal | null;
                 metadata: import("@prisma/client/runtime/library").JsonValue | null;
                 productId: string;
                 skuCode: string;
+                price: import("@prisma/client/runtime/library").Decimal | null;
                 salePrice: import("@prisma/client/runtime/library").Decimal | null;
                 stock: number;
                 reservedStock: number;
@@ -186,10 +186,10 @@ export declare class CartService {
                 status: string;
                 tenantId: string;
                 imageUrl: string | null;
-                price: import("@prisma/client/runtime/library").Decimal | null;
                 metadata: import("@prisma/client/runtime/library").JsonValue | null;
                 productId: string;
                 skuCode: string;
+                price: import("@prisma/client/runtime/library").Decimal | null;
                 salePrice: import("@prisma/client/runtime/library").Decimal | null;
                 stock: number;
                 reservedStock: number;
@@ -254,10 +254,10 @@ export declare class CartService {
                 status: string;
                 tenantId: string;
                 imageUrl: string | null;
-                price: import("@prisma/client/runtime/library").Decimal | null;
                 metadata: import("@prisma/client/runtime/library").JsonValue | null;
                 productId: string;
                 skuCode: string;
+                price: import("@prisma/client/runtime/library").Decimal | null;
                 salePrice: import("@prisma/client/runtime/library").Decimal | null;
                 stock: number;
                 reservedStock: number;

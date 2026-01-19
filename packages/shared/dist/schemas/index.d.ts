@@ -27,12 +27,12 @@ export declare const TenantSchema: z.ZodObject<{
     name: z.ZodString;
     slug: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    id: string;
     name: string;
+    id: string;
     slug: string;
 }, {
-    id: string;
     name: string;
+    id: string;
     slug: string;
 }>;
 export * from './catalog/category.schema';

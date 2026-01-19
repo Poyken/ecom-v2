@@ -1,5 +1,5 @@
 import { InventoryService } from './inventory.service';
-import type { AdjustInventoryDto } from '@ecommerce/shared';
+import type { AdjustInventoryDto, TransferInventoryDto } from '@ecommerce/shared';
 export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
@@ -7,5 +7,8 @@ export declare class InventoryController {
     adjustStock(skuId: string, dto: AdjustInventoryDto): Promise<{
         newStock: any;
         warehouseId: string | undefined;
+    }>;
+    transferStock(skuId: string, dto: TransferInventoryDto): Promise<{
+        success: boolean;
     }>;
 }

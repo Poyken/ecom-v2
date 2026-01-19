@@ -26,8 +26,8 @@ export class ProductsService {
         counter++;
     }
 
-    // Transaction to create product + link categories + create options
-    return this.prisma.$transaction(async (tx) => {
+    // Transaction to create product + link categories + create options + create skus
+    return this.prisma.$transaction(async (tx: any) => {
         const product = await tx.product.create({
             data: {
                 ...rest,
@@ -43,10 +43,12 @@ export class ProductsService {
             }
         });
 
+        const createdOptionValues: Record<string, string> = {}; // "Color:Red" -> ID
+
         // Create Options if provided
         if (options && options.length > 0) {
             for (const opt of options) {
-                await tx.productOption.create({
+                const createdOpt = await tx.productOption.create({
                     data: {
                         name: opt.name,
                         productId: product.id,
@@ -55,6 +57,32 @@ export class ProductsService {
                             create: opt.values.map(val => ({
                                 value: val,
                                 tenantId: this.tenantId,
+                            }))
+                        }
+                    },
+                    include: { values: true }
+                });
+                
+                // Map values for SKU lookup
+                createdOpt.values.forEach((v: any) => {
+                    createdOptionValues[`${createdOpt.name}:${v.value}`] = v.id;
+                });
+            }
+        }
+
+        // Create SKUs if provided
+        if ((createProductDto as any).skus && (createProductDto as any).skus.length > 0) {
+            for (const sku of (createProductDto as any).skus) {
+                await tx.sKU.create({
+                    data: {
+                        productId: product.id,
+                        price: sku.price,
+                        stock: sku.stock,
+                        tenantId: this.tenantId,
+                        optionValues: {
+                            create: sku.optionValues.map((ov: any) => ({
+                                productOptionValueId: createdOptionValues[`${ov.optionName}:${ov.value}`],
+                                tenantId: this.tenantId
                             }))
                         }
                     }
@@ -77,11 +105,32 @@ export class ProductsService {
   async findOne(id: string) {
     const product = await this.prisma.product.findUnique({
       where: { id, tenantId: this.tenantId },
-      include: { brand: true, categories: true, options: { include: { values: true } }, skus: true },
+      include: { 
+        brand: true, 
+        categories: { include: { category: true } }, 
+        options: { include: { values: true } }, 
+        skus: { include: { optionValues: { include: { optionValue: { include: { option: true } } } } } } 
+      },
     });
     if (!product) throw new BadRequestException('Product not found');
     return product;
   }
+
+  async findBySlug(slug: string) {
+    const product = await this.prisma.product.findFirst({
+        where: { slug, tenantId: this.tenantId },
+        include: { 
+            brand: true, 
+            categories: { include: { category: true } }, 
+            options: { include: { values: true } }, 
+            skus: { include: { optionValues: { include: { optionValue: { include: { option: true } } } } } } 
+        },
+    });
+    if (!product) throw new BadRequestException('Product not found');
+    return product;
+  }
+
+
 
   async update(id: string, updateProductDto: UpdateProductDto) {
       // Update logic is complex with relations.

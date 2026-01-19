@@ -1018,16 +1018,17 @@ model Notification {
 }
 
 model InventoryLog {
-  id            String   @id @default(uuid())
+  id            String           @id @default(uuid())
   skuId         String
+  type          InventoryLogType
   changeAmount  Int
   previousStock Int
   newStock      Int
-  reason        String
+  reason        String?
   userId        String?
-  createdAt     DateTime @default(now())
-  sku           Sku      @relation(fields: [skuId], references: [id], onDelete: Cascade)
-  user          User?    @relation(fields: [userId], references: [id])
+  createdAt     DateTime         @default(now())
+  sku           Sku              @relation(fields: [skuId], references: [id], onDelete: Cascade)
+  user          User?            @relation(fields: [userId], references: [id])
 
   // Multi-tenancy
   tenantId String
@@ -1037,6 +1038,16 @@ model InventoryLog {
   @@index([userId])
   @@index([tenantId])
 }
+
+enum InventoryLogType {
+  IMPORT
+  EXPORT
+  ADJUST
+  SALE
+  RETURN
+  TRANSFER
+}
+
 
 model Wishlist {
   id        String   @id @default(uuid())

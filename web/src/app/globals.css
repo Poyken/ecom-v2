@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-accent-store: var(--accent-store);
+  --color-accent-admin: var(--accent-admin);
+  --color-accent-super: var(--accent-super);
+
+  --font-sans: "Inter", var(--font-geist-sans);
+  --font-display: "Outfit", var(--font-geist-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: hsl(240 10% 2%);
+  --foreground: hsl(0 0% 98%);
+  
+  --primary: hsl(250 85% 65%);
+  --primary-foreground: hsl(0 0% 100%);
+  
+  --accent-store: hsl(45 90% 60%);
+  --accent-admin: hsl(150 80% 50%);
+  --accent-super: hsl(280 85% 65%);
+  
+  --glass: hsla(0 0% 100% / 0.03);
+  --glass-border: hsla(0 0% 100% / 0.08);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
+
+@layer utilities {
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+  }
+  
+  .glass-card {
+    background: hsla(240 10% 4% / 0.5);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsla(0 0% 100% / 0.05);
+  }
+}
+
