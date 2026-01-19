@@ -1,5 +1,5 @@
 import { OrdersService } from './orders.service';
-import type { CreateOrderDto } from '@ecommerce/shared';
+import type { CreateOrderDto, UpdateOrderStatusDto } from '@ecommerce/shared';
 export declare class OrdersController {
     private readonly ordersService;
     constructor(ordersService: OrdersService);
@@ -84,6 +84,58 @@ export declare class OrdersController {
         cancellationReason: string | null;
         referredByBlogId: string | null;
     })[]>;
+    findAllAdmin(): Promise<({
+        user: {
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+        };
+        items: {
+            id: string;
+            tenantId: string;
+            imageUrl: string | null;
+            skuId: string;
+            quantity: number;
+            priceAtPurchase: import("@prisma/client/runtime/library").Decimal;
+            productName: string | null;
+            skuNameSnapshot: string | null;
+            productSlug: string | null;
+            orderId: string;
+        }[];
+    } & {
+        id: string;
+        deletedAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        tenantId: string;
+        userId: string;
+        addressId: string | null;
+        paymentMethod: string | null;
+        totalAmount: import("@prisma/client/runtime/library").Decimal;
+        shippingFee: import("@prisma/client/runtime/library").Decimal;
+        recipientName: string;
+        phoneNumber: string;
+        shippingAddress: string | null;
+        shippingCity: string | null;
+        shippingDistrict: string | null;
+        shippingWard: string | null;
+        shippingPhone: string | null;
+        shippingAddressSnapshot: import("@prisma/client/runtime/library").JsonValue | null;
+        paymentStatus: import("@prisma/client").$Enums.PaymentStatus;
+        transactionId: string | null;
+        orderDate: Date;
+        platformFeeAmount: import("@prisma/client/runtime/library").Decimal | null;
+        affiliateCommissionAmount: import("@prisma/client/runtime/library").Decimal | null;
+        vatCompanyName: string | null;
+        vatCompanyAddress: string | null;
+        vatTaxId: string | null;
+        shippingCode: string | null;
+        ghnStatus: string | null;
+        expectedDeliveryTime: Date | null;
+        cancellationReason: string | null;
+        referredByBlogId: string | null;
+    })[]>;
     findOne(req: any, id: string): Promise<{
         address: {
             id: string;
@@ -116,7 +168,54 @@ export declare class OrdersController {
             productSlug: string | null;
             orderId: string;
         }[];
+        logs: ({
+            user: {
+                firstName: string | null;
+                lastName: string | null;
+            } | null;
+        } & {
+            id: string;
+            createdAt: Date;
+            status: import("@prisma/client").$Enums.OrderStatus;
+            userId: string | null;
+            orderId: string;
+            notes: string | null;
+        })[];
     } & {
+        id: string;
+        deletedAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        tenantId: string;
+        userId: string;
+        addressId: string | null;
+        paymentMethod: string | null;
+        totalAmount: import("@prisma/client/runtime/library").Decimal;
+        shippingFee: import("@prisma/client/runtime/library").Decimal;
+        recipientName: string;
+        phoneNumber: string;
+        shippingAddress: string | null;
+        shippingCity: string | null;
+        shippingDistrict: string | null;
+        shippingWard: string | null;
+        shippingPhone: string | null;
+        shippingAddressSnapshot: import("@prisma/client/runtime/library").JsonValue | null;
+        paymentStatus: import("@prisma/client").$Enums.PaymentStatus;
+        transactionId: string | null;
+        orderDate: Date;
+        platformFeeAmount: import("@prisma/client/runtime/library").Decimal | null;
+        affiliateCommissionAmount: import("@prisma/client/runtime/library").Decimal | null;
+        vatCompanyName: string | null;
+        vatCompanyAddress: string | null;
+        vatTaxId: string | null;
+        shippingCode: string | null;
+        ghnStatus: string | null;
+        expectedDeliveryTime: Date | null;
+        cancellationReason: string | null;
+        referredByBlogId: string | null;
+    }>;
+    updateStatus(req: any, id: string, dto: UpdateOrderStatusDto): Promise<{
         id: string;
         deletedAt: Date | null;
         createdAt: Date;

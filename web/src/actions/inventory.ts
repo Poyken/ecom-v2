@@ -35,3 +35,25 @@ export async function adjustStockAction(skuId: string, formData: FormData) {
     return { error: error.message };
   }
 }
+
+export async function transferStockAction(skuId: string, data: any) {
+  try {
+    await apiFetch(`/inventory/transfer/${skuId}`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    revalidatePath('/admin/inventory');
+    return { success: true };
+  } catch (error: any) {
+    return { error: error.message };
+  }
+}
+
+export async function getWarehouseStockAction(warehouseId: string) {
+  return apiFetch(`/warehouses/${warehouseId}/stock`);
+}
+
+export async function getWarehouseLogsAction(warehouseId: string) {
+  return apiFetch(`/warehouses/${warehouseId}/logs`);
+}
+

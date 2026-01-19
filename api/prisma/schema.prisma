@@ -63,6 +63,8 @@ model User {
   customerGroup   CustomerGroup?   @relation(fields: [customerGroupId], references: [id])
   promotions      PromotionUsage[]
   returnRequests  ReturnRequest[]
+  orderLogs       OrderLog[]
+
 
   @@unique([tenantId, email])
   @@unique([id, tenantId])
@@ -443,7 +445,9 @@ model InventoryItem {
   warehouseId   String
   skuId         String
   quantity      Int    @default(0)
+  committed     Int    @default(0)
   minStockLevel Int    @default(0)
+
 
   tenantId String
   tenant   Tenant @relation(fields: [tenantId], references: [id])
@@ -655,6 +659,7 @@ model Order {
   vatCompanyAddress String?
   vatTaxId          String?
 
+  logs           OrderLog[]
   promotions     PromotionUsage[]
   returnRequests ReturnRequest[]
   loyaltyPoints  LoyaltyPoint[]
@@ -684,6 +689,20 @@ model Order {
   @@index([tenantId])
   @@index([tenantId, status, createdAt])
 }
+
+model OrderLog {
+  id        String      @id @default(uuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id])
+  status    OrderStatus
+  notes     String?
+  userId    String?     // The user who triggered the status change
+  user      User?       @relation(fields: [userId], references: [id])
+  createdAt DateTime    @default(now())
+
+  @@index([orderId])
+}
+
 
 model Shipment {
   id           String         @id @default(uuid())

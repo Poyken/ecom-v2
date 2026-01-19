@@ -27,7 +27,7 @@ let OrdersService = class OrdersService {
         this.inventoryService = inventoryService;
     }
     get tenantId() {
-        return this.cls.get('tenantId');
+        return this.cls.get('TENANT_ID');
     }
     async create(userId, createOrderDto) {
         const { addressId, paymentMethod, note } = createOrderDto;
@@ -57,6 +57,7 @@ let OrdersService = class OrdersService {
             });
         }
         const order = await this.prisma.$transaction(async (tx) => {
+            const addressData = await this.getAddressData(tx, userId, addressId);
             const newOrder = await tx.order.create({
                 data: {
                     userId,
@@ -65,18 +66,22 @@ let OrdersService = class OrdersService {
                     paymentStatus: 'UNPAID',
                     paymentMethod,
                     totalAmount,
-                    ...await this.getAddressData(tx, userId, addressId),
+                    recipientName: addressData.recipientName,
+                    phoneNumber: addressData.phoneNumber,
+                    shippingAddress: addressData.shippingAddress,
+                    shippingCity: addressData.shippingCity,
+                    shippingDistrict: addressData.shippingDistrict,
+                    shippingWard: addressData.shippingWard,
+                    shippingPhone: addressData.shippingPhone,
+                    addressId: addressData.addressId,
                     items: {
                         create: orderItemsData
                     }
                 }
             });
+            const defaultWh = await this.inventoryService.findDefaultWarehouse(tx);
             for (const item of cart.items) {
-                await this.inventoryService.adjustStock(item.skuId, {
-                    quantity: -item.quantity,
-                    type: 'SALE',
-                    reason: `Order #${newOrder.id}`,
-                }, tx);
+                await this.inventoryService.reserveStock(item.skuId, defaultWh.id, item.quantity, tx);
             }
             await tx.cartItem.deleteMany({
                 where: { cartId: cart.id }
@@ -95,13 +100,54 @@ let OrdersService = class OrdersService {
     async findOne(userId, id) {
         const order = await this.prisma.order.findUnique({
             where: { id, tenantId: this.tenantId },
-            include: { items: true, address: true }
+            include: { items: true, address: true, logs: { orderBy: { createdAt: 'desc' }, include: { user: { select: { firstName: true, lastName: true } } } } }
         });
         if (!order)
             throw new common_1.NotFoundException('Order not found');
-        if (order.userId !== userId)
-            throw new common_1.BadRequestException('Not authorized');
         return order;
+    }
+    async updateStatus(orderId, status, notes, userId) {
+        return this.prisma.$transaction(async (tx) => {
+            const order = await tx.order.findUnique({
+                where: { id: orderId, tenantId: this.tenantId },
+                include: { items: true }
+            });
+            if (!order)
+                throw new common_1.NotFoundException('Order not found');
+            if (order.status === 'CANCELLED')
+                throw new common_1.BadRequestException('Cannot update a cancelled order');
+            if (order.status === 'COMPLETED')
+                throw new common_1.BadRequestException('Cannot update a completed order');
+            if (status === 'SHIPPED' && order.status !== 'SHIPPED') {
+                const defaultWh = await this.inventoryService.findDefaultWarehouse(tx);
+                for (const item of order.items) {
+                    await this.inventoryService.fulfillStock(item.skuId, defaultWh.id, item.quantity, tx);
+                }
+            }
+            else if (status === 'CANCELLED') {
+                if (order.status === 'PENDING' || order.status === 'PROCESSING') {
+                    const defaultWh = await this.inventoryService.findDefaultWarehouse(tx);
+                    for (const item of order.items) {
+                        await this.inventoryService.releaseStock(item.skuId, defaultWh.id, item.quantity, tx);
+                    }
+                }
+            }
+            const updatedOrder = await tx.order.update({
+                where: { id: orderId },
+                data: {
+                    status,
+                }
+            });
+            await tx.orderLog.create({
+                data: {
+                    orderId,
+                    status,
+                    notes,
+                    userId,
+                }
+            });
+            return updatedOrder;
+        });
     }
     async getAddressData(tx, userId, addressId) {
         let address;
@@ -127,6 +173,16 @@ let OrdersService = class OrdersService {
             shippingPhone: address.phoneNumber,
             addressId: address.id
         };
+    }
+    async findAllTenant() {
+        return this.prisma.order.findMany({
+            where: { tenantId: this.tenantId },
+            include: {
+                items: true,
+                user: { select: { firstName: true, lastName: true, email: true } },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
     }
 };
 exports.OrdersService = OrdersService;

@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Request, UsePipes, Patch } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../../modules/auth/guards/jwt-auth.guard';
-import { CreateOrderSchema } from '@ecommerce/shared';
-import type { CreateOrderDto } from '@ecommerce/shared';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { CreateOrderSchema, UpdateOrderStatusSchema } from '@ecommerce/shared';
+import type { CreateOrderDto, UpdateOrderStatusDto } from '@ecommerce/shared';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 
 @Controller('orders')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
@@ -21,8 +23,27 @@ export class OrdersController {
     return this.ordersService.findAll(req.user.id);
   }
 
+  @Get('admin/all')
+  @Roles('OWNER')
+  findAllAdmin() {
+    return this.ordersService.findAllTenant();
+  }
+
   @Get(':id')
   findOne(@Request() req: any, @Param('id') id: string) {
     return this.ordersService.findOne(req.user.id, id);
   }
+
+  @Post(':id/status')
+  @Roles('OWNER')
+  @UsePipes(new ZodValidationPipe(UpdateOrderStatusSchema))
+  updateStatus(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() dto: UpdateOrderStatusDto,
+  ) {
+    return this.ordersService.updateStatus(id, dto.status, dto.notes || '', req.user.id);
+  }
 }
+
+

@@ -25,7 +25,7 @@ let ProductsService = class ProductsService {
         this.cls = cls;
     }
     get tenantId() {
-        return this.cls.get('tenantId');
+        return this.cls.get('TENANT_ID');
     }
     async create(createProductDto) {
         const { name, categoryIds, options, ...rest } = createProductDto;

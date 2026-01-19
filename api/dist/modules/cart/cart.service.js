@@ -21,7 +21,7 @@ let CartService = class CartService {
         this.cls = cls;
     }
     get tenantId() {
-        return this.cls.get('tenantId');
+        return this.cls.get('TENANT_ID');
     }
     async getCart(userId) {
         let cart = await this.prisma.cart.findUnique({

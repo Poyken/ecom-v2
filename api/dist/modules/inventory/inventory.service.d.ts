@@ -1,11 +1,12 @@
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AdjustInventoryDto, CreateWarehouseDto } from '@ecommerce/shared';
+import { ClsService } from 'nestjs-cls';
 export declare class InventoryService {
     private prisma;
-    private request;
-    private tenantId;
-    constructor(prisma: PrismaService, request: any);
-    get currentTenantId(): string;
+    private cls;
+    private get tenantId();
+    constructor(prisma: PrismaService, cls: ClsService);
+    get currentTenantId(): any;
     findDefaultWarehouse(tx?: any): Promise<any>;
     getAvailableStock(skuId: string): Promise<number>;
     createWarehouse(dto: CreateWarehouseDto): Promise<{
@@ -92,6 +93,7 @@ export declare class InventoryService {
         skuId: string;
         warehouseId: string;
         quantity: number;
+        committed: number;
         minStockLevel: number;
     })[]>;
     getWarehouseLogs(warehouseId: string): Promise<({
@@ -155,4 +157,7 @@ export declare class InventoryService {
     transferStock(skuId: string, fromWarehouseId: string, toWarehouseId: string, quantity: number, reason?: string): Promise<{
         success: boolean;
     }>;
+    reserveStock(skuId: string, warehouseId: string, quantity: number, tx: any): Promise<any>;
+    releaseStock(skuId: string, warehouseId: string, quantity: number, tx: any): Promise<any>;
+    fulfillStock(skuId: string, warehouseId: string, quantity: number, tx: any): Promise<any>;
 }

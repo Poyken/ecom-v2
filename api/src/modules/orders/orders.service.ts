@@ -16,7 +16,7 @@ export class OrdersService {
   ) {}
 
   private get tenantId() {
-    return this.cls.get('tenantId');
+    return this.cls.get('TENANT_ID');
   }
 
   async create(userId: string, createOrderDto: CreateOrderDto) {
@@ -61,6 +61,8 @@ export class OrdersService {
 
     // Create Order with Transaction
     const order = await this.prisma.$transaction(async (tx) => {
+        const addressData = await this.getAddressData(tx, userId, addressId);
+
         // 1. Create Order
         const newOrder = await tx.order.create({
             data: {
@@ -70,35 +72,30 @@ export class OrdersService {
                 paymentStatus: 'UNPAID',
                 paymentMethod,
                 totalAmount,
-                // shippingFee: 0, // Default 0 for now
-                // recipientName: ... need address to fill this. 
-                // For MVP, if addressId is missing, we might fail or mock.
-                // Schema requires: recipientName, phoneNumber, street, city...
-                // So we MUST have an address.
-                
-                // Workaround: Look up Address or User Profile?
-                // Plan said "addressId, paymentMethod, note".
-                // Let's assume addressId is provided OR fetch default address.
-                
-                ...await this.getAddressData(tx, userId, addressId), // Function to get address details
-
+                recipientName: addressData.recipientName,
+                phoneNumber: addressData.phoneNumber,
+                shippingAddress: addressData.shippingAddress,
+                shippingCity: addressData.shippingCity,
+                shippingDistrict: addressData.shippingDistrict,
+                shippingWard: addressData.shippingWard,
+                shippingPhone: addressData.shippingPhone,
+                addressId: addressData.addressId,
                 items: {
                     create: orderItemsData
                 }
             }
         });
 
-        // 2. Reduce Stock (Using InventoryService)
+        // 2. Reserve Stock (Using InventoryService)
+        // For MVP, we reserve from the default warehouse
+        const defaultWh = await this.inventoryService.findDefaultWarehouse(tx);
+        
         for (const item of cart.items) {
-            await this.inventoryService.adjustStock(
+            await this.inventoryService.reserveStock(
                 item.skuId,
-                {
-                    quantity: -item.quantity, // Negative for sale
-                    type: 'SALE',
-                    reason: `Order #${newOrder.id}`,
-                    // warehouseId: undefined (Service picks Default)
-                },
-                tx // Pass transaction
+                defaultWh.id,
+                item.quantity,
+                tx
             );
         }
 
@@ -123,12 +120,66 @@ export class OrdersService {
 
   async findOne(userId: string, id: string) {
     const order = await this.prisma.order.findUnique({
-        where: { id, tenantId: this.tenantId },
-        include: { items: true, address: true }
+      where: { id, tenantId: this.tenantId },
+      include: { items: true, address: true, logs: { orderBy: { createdAt: 'desc' }, include: { user: { select: { firstName: true, lastName: true } } } } }
     });
     if (!order) throw new NotFoundException('Order not found');
-    if (order.userId !== userId) throw new BadRequestException('Not authorized'); // Simple check
     return order;
+  }
+
+  async updateStatus(orderId: string, status: any, notes: string, userId?: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId, tenantId: this.tenantId },
+        include: { items: true }
+      });
+
+      if (!order) throw new NotFoundException('Order not found');
+
+      // 1. Logic Check (Transitions)
+      if (order.status === 'CANCELLED') throw new BadRequestException('Cannot update a cancelled order');
+      if (order.status === 'COMPLETED') throw new BadRequestException('Cannot update a completed order');
+
+      // 2. Inventory Side Effects
+      if (status === 'SHIPPED' && order.status !== 'SHIPPED') {
+        // Fulfill Stock: Deduct physical, release committed
+        const defaultWh = await this.inventoryService.findDefaultWarehouse(tx);
+        for (const item of order.items) {
+          await this.inventoryService.fulfillStock(item.skuId, defaultWh.id, item.quantity, tx);
+        }
+      } else if (status === 'CANCELLED') {
+        // Release Stock: Release committed, physical stays same
+        // Only if it was reserved but not yet fulfilled (PENDING, PROCESSING)
+        if (order.status === 'PENDING' || order.status === 'PROCESSING') {
+          const defaultWh = await this.inventoryService.findDefaultWarehouse(tx);
+          for (const item of order.items) {
+            await this.inventoryService.releaseStock(item.skuId, defaultWh.id, item.quantity, tx);
+          }
+        }
+      }
+
+      // 3. Update Order
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: { 
+          status,
+          // If status is SHIPPED, maybe set shipping info? 
+          // For now just status.
+        }
+      });
+
+      // 4. Create Log
+      await tx.orderLog.create({
+        data: {
+          orderId,
+          status,
+          notes,
+          userId,
+        }
+      });
+
+      return updatedOrder;
+    });
   }
 
   // Helper to get address data
@@ -163,4 +214,16 @@ export class OrdersService {
           addressId: address.id
       };
   }
+
+  async findAllTenant() {
+    return this.prisma.order.findMany({
+      where: { tenantId: this.tenantId },
+      include: {
+        items: true,
+        user: { select: { firstName: true, lastName: true, email: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }
+

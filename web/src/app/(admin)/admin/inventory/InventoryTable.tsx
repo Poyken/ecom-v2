@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { adjustStockAction } from "@/actions/inventory";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { VibrantButton } from "@/components/ui/VibrantButton";
-import { TransferStockModal } from "./TransferStockModal";
+import { TransferStockModal } from "@/components/admin/inventory/TransferStockModal";
+
 
 export default function InventoryTable({ skus, warehouses }: { skus: any[], warehouses: any[] }) {
+  const router = useRouter();
   const [selectedSku, setSelectedSku] = useState<any | null>(null);
   const [transferSku, setTransferSku] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
@@ -19,7 +22,7 @@ export default function InventoryTable({ skus, warehouses }: { skus: any[], ware
     
     if (result.success) {
       setSelectedSku(null);
-      window.location.reload(); 
+      router.refresh();
     } else {
       alert(result.error);
     }
@@ -41,7 +44,6 @@ export default function InventoryTable({ skus, warehouses }: { skus: any[], ware
           <tbody className="divide-y divide-white/5">
             {skus.map((sku: any) => (
               <tr key={sku.id} className="group hover:bg-white/2 transition-colors">
-
                 <td className="px-8 py-6">
                    <div className="font-display font-black text-lg uppercase tracking-tight">{sku.product?.name}</div>
                    <div className="text-[10px] text-zinc-500 font-black tracking-widest uppercase">{sku.skuCode}</div>
@@ -89,7 +91,6 @@ export default function InventoryTable({ skus, warehouses }: { skus: any[], ware
       {/* Adjust Modal */}
       {selectedSku && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-
            <GlassCard className="p-10 max-w-md w-full space-y-8">
               <div className="space-y-1">
                 <p className="text-[10px] font-black uppercase tracking-widest text-accent-admin">Inventory Management</p>
@@ -108,7 +109,7 @@ export default function InventoryTable({ skus, warehouses }: { skus: any[], ware
                  <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Delta Impact</label>
-                        <input type="number" name="changeAmount" required placeholder="+10 or -5" className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 text-sm focus:border-accent-admin outline-none" />
+                        <input type="number" name="changeAmount" required placeholder="+10" className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 text-sm focus:border-accent-admin outline-none" />
                     </div>
                     <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Current SKU Total</label>
@@ -142,5 +143,3 @@ export default function InventoryTable({ skus, warehouses }: { skus: any[], ware
   );
 }
 
-  );
-}

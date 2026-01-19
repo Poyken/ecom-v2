@@ -24,7 +24,7 @@ let SkusService = class SkusService {
         this.inventoryService = inventoryService;
     }
     get tenantId() {
-        return this.cls.get('tenantId');
+        return this.cls.get('TENANT_ID');
     }
     async create(createSkuDto) {
         const { productId, optionValues, skuCode, ...rest } = createSkuDto;

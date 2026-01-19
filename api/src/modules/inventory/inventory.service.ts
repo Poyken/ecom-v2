@@ -1,18 +1,18 @@
-import { Injectable, BadRequestException, NotFoundException, Inject, Scope } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Scope } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AdjustInventoryDto, CreateWarehouseDto } from '@ecommerce/shared';
-import { REQUEST } from '@nestjs/core';
+import { ClsService } from 'nestjs-cls';
 
 @Injectable({ scope: Scope.REQUEST })
 export class InventoryService {
-  private tenantId: string;
+  private get tenantId() {
+    return this.cls.get('TENANT_ID');
+  }
 
   constructor(
     private prisma: PrismaService,
-    @Inject(REQUEST) private request: any
-  ) {
-    this.tenantId = this.request.user?.tenantId;
-  }
+    private cls: ClsService,
+  ) {}
 
   get currentTenantId() {
     return this.tenantId;
@@ -171,7 +171,7 @@ export class InventoryService {
                 newStock: newGlobalStock,
                 reason: reason || `Inventory ${type}`,
                 tenantId: this.tenantId,
-                userId: this.request.user?.id
+                userId: this.cls.get('USER_ID') || this.cls.get('USER')?.id
             }
         });
 
@@ -248,11 +248,72 @@ export class InventoryService {
                 newStock: currentSku.stock,
                 reason: reason || `Transfer from ${fromWarehouseId} to ${toWarehouseId}`,
                 tenantId: this.tenantId,
-                userId: this.request.user?.id
+                userId: this.cls.get('USER_ID') || this.cls.get('USER')?.id
             }
         });
 
         return { success: true };
     });
   }
+
+  /**
+   * Reserve stock (Committed) without reducing physical stock.
+   */
+  async reserveStock(skuId: string, warehouseId: string, quantity: number, tx: any) {
+    return tx.inventoryItem.update({
+      where: { warehouseId_skuId: { warehouseId, skuId } },
+      data: { committed: { increment: quantity } }
+    });
+  }
+
+  /**
+   * Release reserved stock (Cancel)
+   */
+  async releaseStock(skuId: string, warehouseId: string, quantity: number, tx: any) {
+    return tx.inventoryItem.update({
+      where: { warehouseId_skuId: { warehouseId, skuId } },
+      data: { committed: { decrement: quantity } }
+    });
+  }
+
+  /**
+   * Fulfill stock (Ship): Reduce physical AND committed.
+   */
+  async fulfillStock(skuId: string, warehouseId: string, quantity: number, tx: any) {
+    // 1. Update Warehouse Level
+    const item = await tx.inventoryItem.update({
+      where: { warehouseId_skuId: { warehouseId, skuId } },
+      data: { 
+        quantity: { decrement: quantity },
+        committed: { decrement: quantity }
+      }
+    });
+
+    // 2. Update Global SKU Stock
+    const currentSku = await tx.sku.findUnique({ where: { id: skuId }, select: { stock: true } });
+    const newGlobalStock = currentSku.stock - quantity;
+
+    await tx.sku.update({
+      where: { id: skuId },
+      data: { stock: newGlobalStock }
+    });
+
+    // 3. Log the fulfillment
+    await tx.inventoryLog.create({
+      data: {
+        skuId,
+        type: 'EXPORT',
+        changeAmount: -quantity,
+        previousStock: currentSku.stock,
+        newStock: newGlobalStock,
+        reason: 'Order Fulfillment',
+        tenantId: this.tenantId,
+        userId: this.cls.get('USER_ID') || this.cls.get('USER')?.id
+      }
+    });
+
+    return item;
+  }
 }
+
+

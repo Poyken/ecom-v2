@@ -28,7 +28,7 @@ let PaymentsService = class PaymentsService {
         this.providers.set(provider.getProviderName(), provider);
     }
     get tenantId() {
-        return this.cls.get('tenantId');
+        return this.cls.get('TENANT_ID');
     }
     async processPayment(dto) {
         const { orderId, method } = dto;

@@ -24,7 +24,7 @@ export class PaymentsService {
   }
 
   private get tenantId() {
-    return this.cls.get('tenantId');
+    return this.cls.get('TENANT_ID');
   }
 
   async processPayment(dto: ProcessPaymentDto): Promise<PaymentResponseDto> {

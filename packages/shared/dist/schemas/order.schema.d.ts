@@ -13,3 +13,14 @@ export declare const CreateOrderSchema: z.ZodObject<{
     note?: string | undefined;
 }>;
 export type CreateOrderDto = z.infer<typeof CreateOrderSchema>;
+export declare const UpdateOrderStatusSchema: z.ZodObject<{
+    status: z.ZodEnum<["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "RETURNED", "COMPLETED"]>;
+    notes: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "RETURNED" | "COMPLETED";
+    notes?: string | undefined;
+}, {
+    status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "RETURNED" | "COMPLETED";
+    notes?: string | undefined;
+}>;
+export type UpdateOrderStatusDto = z.infer<typeof UpdateOrderStatusSchema>;

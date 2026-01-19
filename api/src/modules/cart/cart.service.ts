@@ -11,7 +11,7 @@ export class CartService {
   ) {}
 
   private get tenantId() {
-    return this.cls.get('tenantId');
+    return this.cls.get('TENANT_ID');
   }
 
   async getCart(userId: string) {

@@ -87,6 +87,7 @@ export declare class WarehousesController {
         skuId: string;
         warehouseId: string;
         quantity: number;
+        committed: number;
         minStockLevel: number;
     })[]>;
     getLogs(id: string): Promise<({

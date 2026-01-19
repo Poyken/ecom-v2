@@ -25,7 +25,7 @@ let CategoriesService = class CategoriesService {
         this.cls = cls;
     }
     get tenantId() {
-        return this.cls.get('tenantId');
+        return this.cls.get('TENANT_ID');
     }
     async create(createCategoryDto) {
         const { name, ...rest } = createCategoryDto;

@@ -8,22 +8,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InventoryService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../common/prisma/prisma.service");
-const core_1 = require("@nestjs/core");
+const nestjs_cls_1 = require("nestjs-cls");
 let InventoryService = class InventoryService {
     prisma;
-    request;
-    tenantId;
-    constructor(prisma, request) {
+    cls;
+    get tenantId() {
+        return this.cls.get('TENANT_ID');
+    }
+    constructor(prisma, cls) {
         this.prisma = prisma;
-        this.request = request;
-        this.tenantId = this.request.user?.tenantId;
+        this.cls = cls;
     }
     get currentTenantId() {
         return this.tenantId;
@@ -146,7 +144,7 @@ let InventoryService = class InventoryService {
                     newStock: newGlobalStock,
                     reason: reason || `Inventory ${type}`,
                     tenantId: this.tenantId,
-                    userId: this.request.user?.id
+                    userId: this.cls.get('USER_ID') || this.cls.get('USER')?.id
                 }
             });
             await tx.sku.update({
@@ -207,17 +205,57 @@ let InventoryService = class InventoryService {
                     newStock: currentSku.stock,
                     reason: reason || `Transfer from ${fromWarehouseId} to ${toWarehouseId}`,
                     tenantId: this.tenantId,
-                    userId: this.request.user?.id
+                    userId: this.cls.get('USER_ID') || this.cls.get('USER')?.id
                 }
             });
             return { success: true };
         });
     }
+    async reserveStock(skuId, warehouseId, quantity, tx) {
+        return tx.inventoryItem.update({
+            where: { warehouseId_skuId: { warehouseId, skuId } },
+            data: { committed: { increment: quantity } }
+        });
+    }
+    async releaseStock(skuId, warehouseId, quantity, tx) {
+        return tx.inventoryItem.update({
+            where: { warehouseId_skuId: { warehouseId, skuId } },
+            data: { committed: { decrement: quantity } }
+        });
+    }
+    async fulfillStock(skuId, warehouseId, quantity, tx) {
+        const item = await tx.inventoryItem.update({
+            where: { warehouseId_skuId: { warehouseId, skuId } },
+            data: {
+                quantity: { decrement: quantity },
+                committed: { decrement: quantity }
+            }
+        });
+        const currentSku = await tx.sku.findUnique({ where: { id: skuId }, select: { stock: true } });
+        const newGlobalStock = currentSku.stock - quantity;
+        await tx.sku.update({
+            where: { id: skuId },
+            data: { stock: newGlobalStock }
+        });
+        await tx.inventoryLog.create({
+            data: {
+                skuId,
+                type: 'EXPORT',
+                changeAmount: -quantity,
+                previousStock: currentSku.stock,
+                newStock: newGlobalStock,
+                reason: 'Order Fulfillment',
+                tenantId: this.tenantId,
+                userId: this.cls.get('USER_ID') || this.cls.get('USER')?.id
+            }
+        });
+        return item;
+    }
 };
 exports.InventoryService = InventoryService;
 exports.InventoryService = InventoryService = __decorate([
     (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),
-    __param(1, (0, common_1.Inject)(core_1.REQUEST)),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        nestjs_cls_1.ClsService])
 ], InventoryService);
 //# sourceMappingURL=inventory.service.js.map
