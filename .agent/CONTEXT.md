@@ -29,15 +29,17 @@ Tài liệu này là **Long-term Memory** của dự án. Cập nhật khi có q
 7. Đánh giá sản phẩm (Review + AI Sentiment analysis).
 8. Đổi trả hàng (RMA Flow: Return Request -> Inspection -> Refund).
 
-### Admin Flow
+### Admin & SaaS Logic
 
-1. Quản lý Catalog: Category, Brand, Product, SKU (đa biến thể: Màu, Size, v.v.).
-2. Quản lý Inventory: Multi-warehouse, InventoryItem, StockLogs.
-3. Quản lý Khuyến mãi: Promotion Rules/Actions (Discount %, Fixed, Free Shipping).
-4. Quản lý Đơn hàng: Order status tracking, Shipment (partial fulfillment), Payment history.
-5. Quản lý User: Customer Groups (VIP, Wholesale), Price Lists (B2B pricing).
-6. Quản lý CMS: Blog, Pages.
-7. Báo cáo/Thống kê: StoreMetrics, Analytics.
+1. **Catalog Management**: Category, Brand, Product, SKU (Variants), Options.
+2. **Inventory**: Multi-warehouse, Stock Logs, Low stock alerts.
+3. **Sales**: Order processing, Shipments (Partial), Payments, Invoices.
+4. **Marketing**: Promotions (Rules/Actions), Loyalty Points, Customer Groups (B2B pricing).
+5. **CMS**: Blog, Static Pages (About/Policy), Navigation Menus.
+6. **SaaS Billing**: Subscriptions, Usage tracking, Platform Fees.
+7. **Support**: RMA (Returns), Ticket System, AI Chatbot.
+8. **System**: Audit Logs, Notifications, Feature Flags, File Uploads (Media).
+9. **Analytics**: Revenue, Traffic, Storage usage per Tenant.
 
 ---
 
@@ -76,6 +78,11 @@ Tài liệu này là **Long-term Memory** của dự án. Cập nhật khi có q
 - **ADR-007**: **Transactional Outbox** (`OutboxEvent` table) cho Event Sourcing.
 - **ADR-008**: **Architectural Scaling Strategy**: Hybrid Multi-tenancy (Shared DB -> DB-per-tenant).
 - **ADR-009**: **Infra Strategy (Solo Dev)**: **Option A (Modern Stack)** - Vercel + Railway + Neon + Upstash. Ưu tiên tốc độ dev, giảm vận hành.
+- **ADR-010**: **Next.js Rendering Strategy**:
+  - **SSG (Static)**: Landing Page, Docs, Marketing Pages (Zero-config).
+  - **ISR (Incremental)**: Product Detail, Blog Post, Public Category Pages (Revalidate: 60s).
+  - **SSR (Server)**: User Profile, Cart, Checkout, Order History (Dynamic Data).
+  - **CSR (Client)**: Admin Dashboard, Complex Interactive Forms (use `use client` + SWR).
 
 ---
 
