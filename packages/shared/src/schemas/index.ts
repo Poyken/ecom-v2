@@ -16,3 +16,12 @@ export const TenantSchema = z.object({
   name: z.string().min(3),
   slug: z.string().min(3),
 });
+
+export * from './catalog/category.schema';
+export * from './catalog/brand.schema';
+export * from './catalog/product.schema';
+export * from './catalog/sku.schema';
+export * from './cart.schema';
+export * from './order.schema';
+export * from './inventory.schema';
+export * from './payment.schema';

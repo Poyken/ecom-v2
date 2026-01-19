@@ -5,10 +5,15 @@ import { PrismaModule } from './common/prisma/prisma.module';
 import { TenancyModule } from './common/tenancy/tenancy.module';
 import { TenancyMiddleware } from './common/tenancy/tenancy.middleware';
 import { AuthModule } from './modules/auth/auth.module';
+import { CatalogModule } from './modules/catalog/catalog.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { validate } from './common/config/config.schema';
+import { CartModule } from './modules/cart/cart.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -23,6 +28,11 @@ import { validate } from './common/config/config.schema';
     PrismaModule,
     TenancyModule,
     AuthModule,
+    CatalogModule,
+    CartModule,
+    OrdersModule,
+    InventoryModule,
+    PaymentsModule,
   ],
 
   providers: [

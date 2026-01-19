@@ -1,4 +1,7 @@
 {
+  "dependencies": {
+    "@nestjs/mapped-types": "*"
+  },
   "name": "ecommerce-monorepo",
   "version": "1.0.0",
   "description": "Ecommerce 2.0 Multi-tenant Platform",

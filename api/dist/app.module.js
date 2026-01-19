@@ -14,10 +14,15 @@ const prisma_module_1 = require("./common/prisma/prisma.module");
 const tenancy_module_1 = require("./common/tenancy/tenancy.module");
 const tenancy_middleware_1 = require("./common/tenancy/tenancy.middleware");
 const auth_module_1 = require("./modules/auth/auth.module");
+const catalog_module_1 = require("./modules/catalog/catalog.module");
 const core_1 = require("@nestjs/core");
 const global_exception_filter_1 = require("./common/filters/global-exception.filter");
 const transform_interceptor_1 = require("./common/interceptors/transform.interceptor");
 const config_schema_1 = require("./common/config/config.schema");
+const cart_module_1 = require("./modules/cart/cart.module");
+const orders_module_1 = require("./modules/orders/orders.module");
+const inventory_module_1 = require("./modules/inventory/inventory.module");
+const payments_module_1 = require("./modules/payments/payments.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -41,6 +46,11 @@ exports.AppModule = AppModule = __decorate([
             prisma_module_1.PrismaModule,
             tenancy_module_1.TenancyModule,
             auth_module_1.AuthModule,
+            catalog_module_1.CatalogModule,
+            cart_module_1.CartModule,
+            orders_module_1.OrdersModule,
+            inventory_module_1.InventoryModule,
+            payments_module_1.PaymentsModule,
         ],
         providers: [
             {
