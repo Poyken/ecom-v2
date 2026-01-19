@@ -125,11 +125,16 @@ Trước khi viết bất kỳ dòng code tính năng nào:
 
 ---
 
-## 11. Auto-Refine Raw Requests 🧠
+## 11. Double-Handshake Protocol (Re-Prompt) 🛑
 
-Nếu User đưa ra yêu cầu sơ sài ("raw request"):
+Quy trình BẮT BUỘC để tránh hiểu sai ý (Hallucination):
 
-1. **Contextualize**: Tự động tra cứu `.agent` để tìm thông tin liên quan.
-2. **Self-Prompt**: Viết lại yêu cầu đó trong đầu theo chuẩn **CLEAR** (Context - Limit - Example - Action - Review).
-3. **Plan**: Dùng yêu cầu đã được làm rõ đó để viết `implementation_plan.md`.
-   _Không cần bắt User phải viết prompt chuẩn, Agent phải tự làm việc đó._
+1.  **Receive**: Nhận yêu cầu từ User (kể cả yêu cầu sơ sài).
+2.  **STOP & Re-Prompt**:
+    - KHÔNG ĐƯỢC làm `implementation_plan.md` ngay.
+    - **PHẢI** tự viết lại yêu cầu đó chi tiết theo chuẩn **CLEAR** (Context, Limit, Example...).
+    - **Hỏi lại User**: "Tôi hiểu yêu cầu như sau... Bạn xác nhận đúng chưa?".
+3.  **Confirm**: Chỉ khi User gõ "OK" / "Confirm", mới được sang bước `Implementation Plan`.
+4.  **Execute**: Code -> Verify -> Report.
+
+_Tuyệt đối không tự ý "đoán" rồi code luôn._
