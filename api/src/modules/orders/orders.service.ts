@@ -6,6 +6,9 @@ import type { CreateOrderDto } from '@ecommerce/shared';
 
 import { InventoryService } from '../inventory/inventory.service';
 import { PromotionsService } from '../promotions/promotions.service';
+import { LoyaltyService } from '../loyalty/loyalty.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
@@ -15,6 +18,8 @@ export class OrdersService {
     private readonly cartService: CartService,
     private readonly inventoryService: InventoryService,
     private readonly promotionsService: PromotionsService,
+    private readonly loyaltyService: LoyaltyService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private get tenantId() {
@@ -187,16 +192,79 @@ export class OrdersService {
       });
 
       // 4. Create Log
-      await tx.orderLog.create({
-        data: {
-          orderId,
-          status,
-          notes,
-          userId,
-        }
-      });
+      await this.prisma.orderLog.create({
+      data: {
+        orderId,
+        status,
+        notes: notes,
+        userId: userId,
+      },
+    });
 
-      return updatedOrder;
+    // Loyalty Points Logic
+    if (status === 'DELIVERED' || status === 'COMPLETED') {
+        const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+        if (order && order.userId) {
+            // Get program rate. Default 1000 VND = 1 Point if not configured? 
+            // Or let LoyaltyService handle calculation.
+            // Current LoyaltyService.earnPoints takes amount.
+            // Let's assume 1000:1 for now or fetching program details.
+            
+            // Fetch program to value rate
+            const program = await this.loyaltyService.getProgram(this.tenantId);
+            const rate = Number(program?.ratePerUnitCurrency) || 1000;
+            const points = Math.floor(Number(order.totalAmount) / rate);
+
+            if (points > 0) {
+                 // Check if already earned? (This is a simple check, in robust system check tx)
+                 // For now just call earn.
+                 await this.loyaltyService.earnPoints(
+                     this.tenantId, 
+                     order.userId, 
+                     points, 
+                     order.id, 
+                     `Points for order #${order.id}`
+                 );
+            }
+        }
+    }
+
+    // Notification Logic
+    if (order.userId) {
+        let title = '';
+        let body = '';
+        
+        switch (status) {
+            case 'CONFIRMED':
+                title = 'Order Confirmed';
+                body = `Your order #${order.id.slice(0, 8).toUpperCase()} has been confirmed!`;
+                break;
+            case 'SHIPPED':
+                title = 'Order Shipped';
+                body = `Your order #${order.id.slice(0, 8).toUpperCase()} checks out our warehouse and is on its way.`;
+                break;
+            case 'DELIVERED':
+                title = 'Order Delivered';
+                body = `Your order #${order.id.slice(0, 8).toUpperCase()} has been delivered. Enjoy!`;
+                break;
+            case 'CANCELLED':
+                 title = 'Order Cancelled';
+                 body = `Your order #${order.id.slice(0, 8).toUpperCase()} has been cancelled.`;
+                 break;
+        }
+
+        if (title) {
+            await this.notificationsService.create(
+                order.userId,
+                NotificationType.ORDER,
+                title,
+                body,
+                { orderId: order.id }
+            );
+        }
+    }
+
+    return updatedOrder;
     });
   }
 

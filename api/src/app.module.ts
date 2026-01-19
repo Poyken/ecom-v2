@@ -13,6 +13,8 @@ import { validate } from './common/config/config.schema';
 import { CartModule } from './modules/cart/cart.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { AiModule } from './modules/ai/ai.module';
+import { LoyaltyModule } from './modules/loyalty/loyalty.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { PaymentsModule } from './modules/payments/payments.module';
@@ -37,6 +39,8 @@ import { PromotionsModule } from './modules/promotions/promotions.module';
     CartModule,
     OrdersModule,
     AiModule,
+    LoyaltyModule,
+    NotificationsModule,
     InventoryModule,
     AnalyticsModule,
     PaymentsModule,

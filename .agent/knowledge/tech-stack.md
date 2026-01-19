@@ -92,6 +92,15 @@ Tài liệu này chứa toàn bộ thông tin về Tech Stack, dependencies và 
 | `@hookform/resolvers` | Zod Integration |
 | `zod`                 | Validation      |
 
+### Real-time & Communications
+
+| Package              | Mục đích            |
+| -------------------- | ------------------- |
+| `@nestjs/websockets` | WebSocket Gateway   |
+| `socket.io`          | Socket Server       |
+| `socket.io-client`   | Socket Client (Web) |
+| `nodemailer`         | Email Service       |
+
 ### UI Components
 
 | Package                    | Mục đích                 |
@@ -117,13 +126,14 @@ Tài liệu này chứa toàn bộ thông tin về Tech Stack, dependencies và 
 
 ### Utilities
 
-| Package            | Mục đích                 |
-| ------------------ | ------------------------ |
-| `date-fns`         | Date Formatting          |
-| `lodash`           | Utility Functions        |
-| `jose`             | JWT (Server-side)        |
-| `next-safe-action` | Type-safe Server Actions |
-| `sonner`           | Toast Notifications      |
+| Package            | Mục đích                  |
+| ------------------ | ------------------------- |
+| `date-fns`         | Date Formatting           |
+| `lodash`           | Utility Functions         |
+| `jose`             | JWT (Server-side)         |
+| `next-safe-action` | Type-safe Server Actions  |
+| `middleware.ts`    | Auth Guard & Auto Refresh |
+| `sonner`           | Toast Notifications       |
 
 ---
 

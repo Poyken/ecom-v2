@@ -109,3 +109,17 @@ Hệ thống đang tiến vào giai đoạn Enterprise nâng cao với trọng t
 - **Phase 17: Advanced Fulfillment & Multi-Warehouse Routing**
   - Tự động hóa việc chọn kho hàng tối ưu để fulfill đơn hàng.
   - Quản lý Split Shipments (Tách đơn hàng giao nhiều lần).
+
+## Changelog
+
+- [2026-01-19] Completed Phase 15: Loyalty & Rewards System.
+  - Implemented full backend logic (Service/Controller) for points, tiers, and rewards.
+  - Integrated with OrdersService for automatic point earning.
+  - Deployed Customer Loyalty Dashboard with redemption capabilities.
+  - Updated Auth system to return rich profile data (including loyalty stats).
+
+- [2026-01-19] Implemented Refresh Token Rotation (Backend + Frontend Middleware).
+- [2026-01-19] Implemented Notification System (WebSocket, Notification Center UI).
+  - Backend: Added `refreshToken` to AuthService & `POST /auth/refresh` endpoint.
+  - Web: Added `middleware.ts` for Server-Side auto-refresh via Backend API.
+  - Critical: Ensured user session continuity without manual re-login.

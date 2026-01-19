@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from 'next/link';
 import CartCounter from '@/components/store/CartCounter';
+import { NotificationBell } from '@/components/shared/NotificationBell';
 import { VibrantButton } from '@/components/ui/VibrantButton';
 import ChatWidget from "@/components/ai/ChatWidget";
 
@@ -21,6 +22,7 @@ export default function StoreLayout({
             <Link href="/products" className="hover:text-primary transition-colors">Catalog</Link>
           </nav>
           <div className="flex items-center gap-6">
+            <NotificationBell />
             <CartCounter />
             <Link href="/login">
               <VibrantButton size="sm" variant="outline" className="rounded-full border-zinc-800">

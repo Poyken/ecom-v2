@@ -29,6 +29,16 @@ Hệ thống hỗ trợ RBAC động (Dynamic Roles):
   - **B2C**: Khách lẻ.
   - **B2B**: Thuộc `CustomerGroup`, có `PriceList` riêng.
 
+### 1.3 Token Refresh & Security
+
+Để đảm bảo an toàn và trải nghiệm liền mạch:
+
+- **Access Token**: Short-lived (ví dụ 15 phút), lưu trong HTTP-Only Cookie.
+- **Refresh Token**: Long-lived (ví dụ 7 ngày), lưu trong HTTP-Only Cookie (Rotation).
+- **Auto-Refresh**:
+  - Middleware (Server-Side) tự động kiểm tra và refresh token trước khi render trang bảo vệ.
+  - Client-Side tự động retry request khi gặp lỗi 401 nhờ interceptor gọi qua Server Action proxy.
+
 ---
 
 ## 2. Catalog & Inventory (Advanced)
@@ -139,3 +149,24 @@ Hỗ trợ Multi-Warehouse:
 - **Subscription**: Tenant đăng ký gói.
 - **Limits**: Giới hạn số lượng Product, Staff, Storage theo gói.
 - **Billing**: Thu phí Tenant định kỳ.
+
+---
+
+## 7. Notification & Real-time Alerts
+
+### 7.1 Architecture
+
+- **Protocol**: WebSocket (Socket.IO) kết hợp với REST API polling.
+- **Gateway**: `NotificationsGateway` quản lý kết nối real-time, authenticate qua Token (Handshake Auth/Header/Cookie).
+- **Fallback**: Client fetch API `/notifications` để lấy lịch sử và trạng thái unread khi mới load trang.
+
+### 7.2 Notification Flow
+
+1. **Trigger Event**: Các sự kiện hệ thống (Order Update, Loyalty Tier Change, Promotion) gọi `NotificationsService`.
+2. **Persist**: Lưu thông báo vào bảng `Notification` (Postgres) với trạng thái `isRead: false`.
+3. **Dispatch**:
+   - Nếu User đang online (kết nối Socket): Gateway bắn event `notification:new` trực tiếp tới user room. Client hiển thị Toast/Badge ngay lập tức.
+   - Nếu User offline: Thông báo vẫn được lưu trong DB. Khi User online lại, Client fetch list mới nhất.
+4. **Interaction**:
+   - User click Bell Icon -> Xem list.
+   - User click "Mark as Read" -> Call API `PATCH` -> Update DB -> Giảm Unread Count.

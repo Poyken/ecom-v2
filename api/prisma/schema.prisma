@@ -33,7 +33,7 @@ model User {
   referredByUser         User?                   @relation("UserReferrals", fields: [referredByUserId], references: [id])
   referrals              User[]                  @relation("UserReferrals")
   commissionTransactions CommissionTransaction[]
-  loyaltyPoints          LoyaltyPoint[]
+  legacyLoyaltyLogs      LoyaltyPoint[]
 
   // Media Reference
   avatarId String?
@@ -64,6 +64,13 @@ model User {
   promotions      PromotionUsage[]
   returnRequests  ReturnRequest[]
   orderLogs       OrderLog[]
+
+  // Loyalty
+  loyaltyPoints       Int                       @default(0)
+  loyaltyTierId       String?
+  loyaltyTier         LoyaltyTier?              @relation(fields: [loyaltyTierId], references: [id])
+  loyaltyTransactions LoyaltyPointTransaction[]
+  redeemedRewards     LoyaltyRewardRedemption[]
 
 
   @@unique([tenantId, email])
@@ -666,7 +673,7 @@ model Order {
   logs           OrderLog[]
   promotions     PromotionUsage[]
   returnRequests ReturnRequest[]
-  loyaltyPoints  LoyaltyPoint[]
+  legacyLoyaltyLogs  LoyaltyPoint[]
 
   addressId            String?
   shippingCode         String?
@@ -1025,17 +1032,28 @@ model SkuImage {
   @@index([tenantId])
 }
 
+enum NotificationType {
+  SYSTEM
+  ORDER
+  PROMOTION
+  LOYALTY
+}
+
 model Notification {
-  id        String   @id @default(uuid())
-  type      String
+  id        String           @id @default(uuid())
   title     String
-  message   String
-  isRead    Boolean  @default(false)
-  link      String?
-  createdAt DateTime @default(now())
+  body      String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  
+  data      Json? // Extra data (orderId, url, etc.)
+  
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
   @@index([userId])
   @@index([isRead])
 }
@@ -1415,7 +1433,8 @@ model Tenant {
 
   taxRates TaxRate[]
 
-  loyaltyPoints LoyaltyPoint[]
+  legacyLoyaltyLogs LoyaltyPoint[]
+  loyaltyProgram    LoyaltyProgram?
 
   metrics StoreMetrics[]
 
@@ -1688,3 +1707,111 @@ enum CommissionStatus {
   COMPLETED
   CANCELLED
 }
+
+// =====================================================================
+// LOYALTY SYSTEM
+// =====================================================================
+
+model LoyaltyProgram {
+  id                  String   @id @default(uuid())
+  name                String
+  description         String?
+  ratePerUnitCurrency Decimal  @default(0.001) @db.Decimal(10, 6) // e.g. 1 point per 1000 VND -> 0.001
+  
+  tenantId String @unique
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  tiers   LoyaltyTier[]
+  rewards LoyaltyReward[]
+  
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LoyaltyTier {
+  id       String  @id @default(uuid())
+  name     String
+  minSpend Decimal @db.Decimal(20, 2)
+  benefits Json?   @default("[]")
+  
+  programId String
+  program   LoyaltyProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  
+  users User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([programId, name])
+  @@index([programId, minSpend])
+}
+
+model LoyaltyPointTransaction {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  amount      Int // Positive for earn, Negative for redeem
+  type        LoyaltyTransactionType
+  sourceId    String? // Order ID, etc.
+  description String?
+  
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+enum LoyaltyTransactionType {
+  EARN_ORDER
+  REDEEM_REWARD
+  ADJUSTMENT
+  EXPIRATION
+  REFUND_DEDUCTION
+}
+
+model LoyaltyReward {
+  id                    String            @id @default(uuid())
+  name                  String
+  description           String?
+  pointsCost            Int
+  type                  LoyaltyRewardType
+  value                 Decimal?          @db.Decimal(10, 2)
+  maxRedemptionsPerUser Int?
+  
+  programId String
+  program   LoyaltyProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  
+  redemptions LoyaltyRewardRedemption[]
+  
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([programId])
+}
+
+enum LoyaltyRewardType {
+  VOUCHER_DISCOUNT
+  PHYSICAL_GIFT
+}
+
+model LoyaltyRewardRedemption {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  rewardId String
+  reward   LoyaltyReward @relation(fields: [rewardId], references: [id])
+  
+  code   String? // e.g. Voucher code generated
+  status String  @default("COMPLETED")
+  
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([rewardId])
+}
+

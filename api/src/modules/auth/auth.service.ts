@@ -120,6 +120,38 @@ export class AuthService {
     return this.generateTokens(user.id, user.email, user.tenantId, 'USER');
   }
 
+  async getProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { loyaltyTier: true },
+    });
+
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const { password, ...rest } = user;
+    return rest;
+  }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.config.getOrThrow<string>('JWT_REFRESH_SECRET'),
+      });
+
+      // Check if user exists (and still active)
+      const user = await this.prisma.user.findUnique({
+         where: { id: payload.sub }
+      });
+      if (!user) throw new UnauthorizedException('User no longer exists');
+
+      // Generate new tokens (Rotation)
+      return this.generateTokens(user.id, user.email, payload.tenantId, payload.role);
+
+    } catch (e) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+  }
+
   private async generateTokens(userId: string, email: string, tenantId: string, role: string) {
     const payload = { sub: userId, email, tenantId, role };
     const secret = this.config.getOrThrow<string>('JWT_SECRET');
