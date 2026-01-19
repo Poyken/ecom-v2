@@ -1,3 +1,8 @@
+---
+trigger: always_on
+description: Bộ quy tắc CLEAR Framework để viết prompt hiệu quả cho AI.
+---
+
 # Prompting Rules (CLEAR Framework)
 
 Bộ quy tắc để viết prompt hiệu quả khi làm việc với AI Agent.

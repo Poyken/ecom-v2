@@ -13,9 +13,9 @@ Quy trình chuẩn để khởi tạo dự án Ecommerce từ số 0.
 ### 1.1 Monorepo Setup
 
 ```bash
-# Tạo workspace
-mkdir ecommerce && cd ecommerce
+# Tại root directory
 pnpm init
+
 
 # Tạo pnpm-workspace.yaml
 packages:
@@ -162,3 +162,27 @@ src/
 - [ ] Backup strategy
 - [ ] Rate limiting configured
 - [ ] CORS properly set
+
+## Phase 6: Deployment (Modern Stack)
+
+Refer to `knowledge/architecture.md` (ADR-009) for Strategy.
+
+### 6.1 Database (Neon)
+
+1. Tạo Project trên Neon Console.
+2. Lấy `DATABASE_URL` (Pooling mode).
+3. Set vào Environment Variables của cả API và Web.
+
+### 6.2 Backend (Railway)
+
+1. Connect Github Repo.
+2. Config Start Command: `node dist/main` (cho NestJS).
+3. Add Env Vars: `DATABASE_URL`, `REDIS_URL` (Upstash), `JWT_SECRET`.
+4. Generate Domain (e.g., `api-production.up.railway.app`).
+
+### 6.3 Frontend (Vercel)
+
+1. Import Github Repo.
+2. Framework Preset: Next.js.
+3. Add Env Vars: `NEXT_PUBLIC_API_URL`.
+4. Deploy & Enjoy!

@@ -1,11 +1,18 @@
+---
+description: Quy trình chuẩn để phát triển tính năng mới (Standard Feature Flow)
+---
+
 # Workflow: Standard Feature Flow
 
 Quy trình chuẩn để biến ý tưởng thành tính năng hoàn chỉnh.
 
 ## 1. Planning (Nghiên cứu)
 
-- Phân tích yêu cầu và kiểm tra cấu trúc DB hiện tại.
-- Cập nhật `CONTEXT.md` nếu có thay đổi về nghiệp vụ lớn.
+- **Check `.agent`**: Đọc `knowledge/business-flows.md` và `tech-stack.md` trước.
+- **Refine Request**: Nếu yêu cầu sơ sài, tự viết lại theo chuẩn CLEAR (Rule #11).
+- **Phân tích yêu cầu**: Kiểm tra xem tính năng này cần sửa những gì.
+- **Phân tích yêu cầu**: Kiểm tra xem tính năng này cần sửa những gì.
+- **Implementation Plan**: Tạo file `implementation_plan.md` và **CHỜ USER DUYỆT**.
 - Phác thảo schema (Prisma/Zod) trước khi code.
 
 ## 2. Foundation (Nền tảng)

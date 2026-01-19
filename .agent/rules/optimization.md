@@ -1,3 +1,8 @@
+---
+trigger: always_on
+description: Các quy tắc tối ưu hóa cho dự án (Zod-Only, Module consolidation, Shared package).
+---
+
 # Optimization Rules (Tối ưu hóa)
 
 Các quy tắc này khắc phục những vấn đề đã phát hiện trong dự án hiện tại.

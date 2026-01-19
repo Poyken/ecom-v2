@@ -1,3 +1,8 @@
+---
+trigger: always_on
+description: Các quy chuẩn code Senior Fullstack (Zod-first, Clean Code, Performance).
+---
+
 # Senior Fullstack Rules
 
 Bộ quy tắc này đảm bảo mọi đoạn code bạn viết đều đạt tiêu chuẩn Senior và dễ bảo trì cho solo developer.

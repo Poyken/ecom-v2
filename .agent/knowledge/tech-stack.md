@@ -130,13 +130,19 @@ Tài liệu này chứa toàn bộ thông tin về Tech Stack, dependencies và 
 
 ### Docker Services
 
-| Service    | Image                  | Port              |
-| ---------- | ---------------------- | ----------------- |
-| `postgres` | ankane/pgvector:v0.4.1 | 5432              |
-| `redis`    | redis:7-alpine         | 6379              |
-| `api`      | Custom (NestJS)        | 8080 (2 replicas) |
-| `web`      | Custom (Next.js)       | 3000              |
-| `worker`   | Custom (BullMQ)        | -                 |
+| Service    | Image                  | Port              | Env (Local)    |
+| ---------- | ---------------------- | ----------------- | -------------- |
+| `postgres` | ankane/pgvector:v0.4.1 | 5433              | Docker         |
+| `redis`    | redis:7-alpine         | 6385              | Docker         |
+| `api`      | Custom (NestJS)        | 8080 (2 replicas) | Local / Docker |
+| `web`      | Custom (Next.js)       | 3000              | Local          |
+
+### Production Cloud (Modern Stack)
+
+- **Frontend**: Vercel
+- **Backend**: Railway / Render
+- **Database**: Neon (Serverless Postgres)
+- **Cache/Queue**: Upstash (Redis/Kafka)
 
 ### Environment Variables (Required)
 

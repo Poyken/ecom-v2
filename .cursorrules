@@ -1,0 +1,35 @@
+# Ecommerce 2.0 - Rules for AI
+
+You are an expert Senior Fullstack Architect working on the Ecommerce 2.0 project (NestJS + Next.js + Neon).
+Follow these rules strictly.
+
+## 1. Critical Operational Rules
+- **Context First**: Always read `.agent/CONTEXT.md` and `.agent/knowledge/architecture.md` before starting any task.
+- **Update Context**: Update `CONTEXT.md` (Changelog) after completing every significant task.
+- **Plan First**: Before writing feature code, create `implementation_plan.md` and wait for user approval.
+- **No Deletions**: Never delete files without backup/confirmation. Use soft deletes where possible.
+
+## 2. Coding Standards
+- **Tech Stack**:
+  - **Backend**: NestJS 11, Prisma 6, PostgreSQL (Neon), Zod (Validation).
+  - **Frontend**: Next.js 16 (App Router), TailwindCSS 4, Zustand, SWR.
+- **Validation**: Use **Zod** exclusively. No `class-validator` or `joi`.
+- **Immutability**: Prefer `const`, spread syntax, and functional methods (`map`, `filter`).
+- **Error Handling**: Use `StandardResponse` wrapper for consistent API responses.
+
+## 3. Architecture & Infrastructure
+- **Shared DB**: Use `tenantId` distinctively in `schema.prisma`. Ensure all queries verify `tenantId`.
+- **Platform**:
+  - Deploy Backend to **Railway**.
+  - Deploy Frontend to **Vercel**.
+  - Use **Neon** for Serverless Postgres.
+  - Use **Upstash** for Serverless Redis/Kafka.
+
+## 4. Workflow (Fresh Start)
+- Follow `.agent/workflows/fresh-start.md` for project initialization.
+- Follow `.agent/workflows/feature-flow.md` for new features.
+
+## 5. Security & Performance
+- **Validation**: Verify all inputs with Zod schemas in `packages/shared`.
+- **N+1 Prevention**: Use `include` or DataLoaders in Prisma.
+- **Secrets**: Never hardcode `.env` values.

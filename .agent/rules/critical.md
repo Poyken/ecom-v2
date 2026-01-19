@@ -1,3 +1,8 @@
+---
+trigger: always_on
+description: Các quy tắc sống còn mà Agent bắt buộc phải tuân thủ (Context, Plan, Backup).
+---
+
 # Critical Operational Rules (Quy tắc sống còn)
 
 Đây là các quy tắc **BẮT BUỘC** mà Agent phải tuân thủ trong mọi tình huống.
@@ -97,3 +102,34 @@ Khi chuyển workspace hoặc bắt đầu session mới:
 1. Đọc `CONTEXT.md` đầu tiên.
 2. Đọc `.agent/rules/` để hiểu standards.
 3. Đọc `.agent/workflows/` trước khi thực hiện bất kỳ task nào.
+
+---
+
+## 9. Prioritize `.agent` Knowledge Base ✅
+
+Trước khi đặt câu hỏi hoặc bắt đầu code:
+
+1. **Tìm kiếm trong `.agent`**: Thông tin về Tech Stack, Business Flow, Architecture có sẵn trong folder này không?
+2. **Tuân thủ Standards**: Code phải theo đúng `tech-stack.md` và `coding-standards.md`.
+3. **Không đoán mò**: Nếu thông tin trong `.agent` thiếu hoặc mâu thuẫn, **HỎI USER** ngay lập tức.
+
+---
+
+## 10. Implementation Plan First (BẮT BUỘC) ⚠️
+
+Trước khi viết bất kỳ dòng code tính năng nào:
+
+1. **Dừng lại**: Đừng code ngay.
+2. **Review Plan**: Tạo file `implementation_plan.md` liệt kê các bước, file sẽ sửa, và logic chính.
+3. **Ask for Approval**: Nhờ user review plan. Chỉ khi user nói "OK" mới được code.
+
+---
+
+## 11. Auto-Refine Raw Requests 🧠
+
+Nếu User đưa ra yêu cầu sơ sài ("raw request"):
+
+1. **Contextualize**: Tự động tra cứu `.agent` để tìm thông tin liên quan.
+2. **Self-Prompt**: Viết lại yêu cầu đó trong đầu theo chuẩn **CLEAR** (Context - Limit - Example - Action - Review).
+3. **Plan**: Dùng yêu cầu đã được làm rõ đó để viết `implementation_plan.md`.
+   _Không cần bắt User phải viết prompt chuẩn, Agent phải tự làm việc đó._

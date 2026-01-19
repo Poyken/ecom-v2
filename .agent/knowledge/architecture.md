@@ -127,6 +127,28 @@ api/src/
 - **Lý do**: High availability, zero-downtime deployment.
 - **Yêu cầu**: Redis cho session/cache sharing.
 
+- **Yêu cầu**: Redis cho session/cache sharing.
+
+### ADR-008: Multi-Tenancy Strategy
+
+- **Quyết định**: Hybrid Multi-Tenancy. Shared Database cho Default, Database-per-Tenant cho Enterprise.
+- **Lý do**: Cân bằng dữa Chi phí và Performance/Isolation.
+
+### ADR-009: Cloud Infrastructure Mapping (Solo Dev / Startup Phase)
+
+- **Quyết định**: **Option A - The "Modern Stack" (No-Ops)**.
+- **Stack Chi tiết**:
+  - **Frontend**: Vercel.
+  - **Backend**: Railway hoặc Render.
+  - **Database**: Neon (Serverless Postgres).
+  - **Queue/Cache**: Upstash (Serverless Redis) hoặc Redis nội bộ của Railway.
+- **Lý do**: Tối ưu thời gian phát triển (Time-to-market) và giảm gánh nặng vận hành (Cognitive load) cho Solo Dev. Chấp nhận chi phí cao hơn VPS tự quản lý để đổi lấy sự ổn định và Scalability tự động.
+
+### ADR-010: Scaling Philosophy for Solo Dev
+
+- **Triết lý**: "Buy Time with Money". Ưu tiên Managed Services hơn Self-hosted trong giai đoạn < 10k users.
+- **Trigger để thay đổi**: Khi chi phí Infra vượt quá $500/tháng hoặc doanh thu đủ nuôi 1 DevOps engineer -> Cân nhắc migrate sang AWS Native hoặc Self-hosted VPS.
+
 ---
 
 ## 4. Security Measures
