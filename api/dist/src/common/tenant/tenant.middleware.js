@@ -42,6 +42,8 @@ let TenantMiddleware = class TenantMiddleware {
             '/api/v1/tenants/onboard',
             '/api/v1/auth/login',
             '/api/v1/auth/register',
+            '/api/v1/catalog',
+            '/api/v1/orders/vnpay-ipn',
         ];
         return publicRoutes.some((route) => path.startsWith(route));
     }

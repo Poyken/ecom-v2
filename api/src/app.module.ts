@@ -6,6 +6,7 @@ import { TenantMiddleware } from './common/tenant/tenant.middleware';
 import { TenantModule } from './modules/tenant/tenant.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
     TenantModule,
     CatalogModule,
     InventoryModule,
+    OrderModule,
   ],
 })
 export class AppModule implements NestModule {

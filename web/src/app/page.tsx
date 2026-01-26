@@ -63,7 +63,7 @@ export default function Storefront() {
       {/* Hero Section */}
       <section className="relative h-[80vh] flex items-center px-12 overflow-hidden bg-black text-white">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
+          <div className="absolute inset-0 bg-linear-to-r from-black via-black/40 to-transparent z-10" />
           <img 
             src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=2070" 
             className="w-full h-full object-cover opacity-60 scale-105" 

@@ -1,0 +1,57 @@
+
+> api@0.0.1 test:e2e
+> jest --config ./test/jest-e2e.json test/full-flow.e2e-spec.ts
+
+FAIL test/full-flow.e2e-spec.ts
+  B2B2C Full Flow (e2e)
+    ✕ Step 1: Onboard Tenant (1 ms)
+    ✕ Step 2: Setup Catalog and Inventory (1 ms)
+    ✕ Step 3: Execute Checkout and IPN
+
+  ● B2B2C Full Flow (e2e) › Step 1: Onboard Tenant
+
+    TypeError: Cannot read properties of undefined (reading 'stack')
+
+      25 |     const server = app.getHttpServer();
+      26 |     const router = server._events.request._router;
+    > 27 |     const availableRoutes = router.stack
+         |                                    ^
+      28 |       .map((layer: any) => layer.route ? `${Object.keys(layer.route.methods).join(',').toUpperCase()} ${layer.route.path}` : null)
+      29 |       .filter((r: any) => r);
+      30 |     console.log('Available Routes:', availableRoutes);
+
+      at Object.<anonymous> (full-flow.e2e-spec.ts:27:36)
+
+  ● B2B2C Full Flow (e2e) › Step 2: Setup Catalog and Inventory
+
+    TypeError: Cannot read properties of undefined (reading 'stack')
+
+      25 |     const server = app.getHttpServer();
+      26 |     const router = server._events.request._router;
+    > 27 |     const availableRoutes = router.stack
+         |                                    ^
+      28 |       .map((layer: any) => layer.route ? `${Object.keys(layer.route.methods).join(',').toUpperCase()} ${layer.route.path}` : null)
+      29 |       .filter((r: any) => r);
+      30 |     console.log('Available Routes:', availableRoutes);
+
+      at Object.<anonymous> (full-flow.e2e-spec.ts:27:36)
+
+  ● B2B2C Full Flow (e2e) › Step 3: Execute Checkout and IPN
+
+    TypeError: Cannot read properties of undefined (reading 'stack')
+
+      25 |     const server = app.getHttpServer();
+      26 |     const router = server._events.request._router;
+    > 27 |     const availableRoutes = router.stack
+         |                                    ^
+      28 |       .map((layer: any) => layer.route ? `${Object.keys(layer.route.methods).join(',').toUpperCase()} ${layer.route.path}` : null)
+      29 |       .filter((r: any) => r);
+      30 |     console.log('Available Routes:', availableRoutes);
+
+      at Object.<anonymous> (full-flow.e2e-spec.ts:27:36)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 3 total
+Snapshots:   0 total
+Time:        0.968 s, estimated 2 s
+Ran all test suites matching test/full-flow.e2e-spec.ts.
