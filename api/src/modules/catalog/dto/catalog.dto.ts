@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsOptional, IsBoolean, IsNumber, IsArray, ValidateNested, IsUUID, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  IsArray,
+  ValidateNested,
+  IsUUID,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -45,7 +53,7 @@ export class CreateSkuDto {
 
   @ApiProperty({ example: { Color: 'Blue', Capacity: '256GB' } })
   @IsOptional()
-  attributes?: any;
+  attributes?: Record<string, any>;
 }
 
 export class CreateProductDto {

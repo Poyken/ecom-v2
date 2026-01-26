@@ -9,7 +9,7 @@ export declare class CreateSkuDto {
     price: number;
     comparePrice?: number;
     stock: number;
-    attributes?: any;
+    attributes?: Record<string, any>;
 }
 export declare class CreateProductDto {
     name: string;
