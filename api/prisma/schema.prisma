@@ -143,28 +143,43 @@ model OptionValue {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   option      ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  skuValues   SkuValue[]
 
   @@index([optionId])
   @@map("option_values")
 }
 
 model Sku {
-  id           String   @id @default(uuid()) @db.Uuid
-  tenantId     String   @db.Uuid
-  productId    String   @db.Uuid
+  id           String     @id @default(uuid()) @db.Uuid
+  tenantId     String     @db.Uuid
+  productId    String     @db.Uuid
   sku          String
   barcode      String?
-  price        Decimal  @db.Decimal(10, 2)
-  comparePrice Decimal? @db.Decimal(10, 2)
-  stock        Int      @default(0)
-  attributes   Json     @default("{}") // e.g., {"Color": "Blue", "Size": "XL"}
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  price        Decimal    @db.Decimal(10, 2)
+  comparePrice Decimal?   @db.Decimal(10, 2)
+  stock        Int        @default(0)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  tenant       Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  skuValues    SkuValue[]
 
   @@unique([tenantId, sku])
   @@index([productId])
   @@map("skus")
+}
+
+model SkuValue {
+  id            String      @id @default(uuid()) @db.Uuid
+  tenantId      String      @db.Uuid
+  skuId         String      @db.Uuid
+  optionValueId String      @db.Uuid
+  sku           Sku         @relation(fields: [skuId], references: [id], onDelete: Cascade)
+  optionValue   OptionValue @relation(fields: [optionValueId], references: [id], onDelete: Cascade)
+
+  @@unique([skuId, optionValueId])
+  @@index([skuId])
+  @@index([optionValueId])
+  @@map("sku_values")
 }

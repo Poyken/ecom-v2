@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implementation of `TenantMiddleware` for Header-based tenant isolation.
   - Usage of `AsyncLocalStorage` for request-scoped tenant context (TenantStorage).
   - Database schema for `Tenant` and `User` with multi-tenant relations.
+  - **Structural SKU Matrix**: Formal relational mapping between Products, Options, values, and SKUs (Variant Matrix).
 - **Identity & Access Management (IAM)**:
   - Auth module with JWT-based authentication.
   - User registration and login with bcrypt password hashing.

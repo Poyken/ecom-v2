@@ -9,51 +9,72 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateProductDto = exports.CreateSkuDto = exports.CreateCategoryDto = void 0;
+exports.CreateCategoryDto = exports.CreateProductDto = exports.CreateSkuDto = exports.CreateSkuValueDto = exports.CreateProductOptionDto = exports.CreateOptionValueDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
-class CreateCategoryDto {
-    name;
-    slug;
-    description;
-    parentId;
+class CreateOptionValueDto {
+    value;
+    displayName;
 }
-exports.CreateCategoryDto = CreateCategoryDto;
+exports.CreateOptionValueDto = CreateOptionValueDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Electronics' }),
+    (0, swagger_1.ApiProperty)({ example: 'Blue' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreateCategoryDto.prototype, "name", void 0);
+], CreateOptionValueDto.prototype, "value", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'electronics' }),
+    (0, swagger_1.ApiProperty)({ example: 'Ocean Blue' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreateCategoryDto.prototype, "slug", void 0);
+], CreateOptionValueDto.prototype, "displayName", void 0);
+class CreateProductOptionDto {
+    name;
+    values;
+}
+exports.CreateProductOptionDto = CreateProductOptionDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'All electronic gadgets' }),
+    (0, swagger_1.ApiProperty)({ example: 'Color' }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreateCategoryDto.prototype, "description", void 0);
+], CreateProductOptionDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'uuid-of-parent-category' }),
-    (0, class_validator_1.IsUUID)(),
-    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => CreateOptionValueDto),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, swagger_1.ApiProperty)({ type: [CreateOptionValueDto] }),
+    __metadata("design:type", Array)
+], CreateProductOptionDto.prototype, "values", void 0);
+class CreateSkuValueDto {
+    optionName;
+    value;
+}
+exports.CreateSkuValueDto = CreateSkuValueDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'The value of the option, e.g., Blue' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], CreateCategoryDto.prototype, "parentId", void 0);
+], CreateSkuValueDto.prototype, "optionName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'The specific value selected, e.g., Blue' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateSkuValueDto.prototype, "value", void 0);
 class CreateSkuDto {
     sku;
     price;
     comparePrice;
     stock;
-    attributes;
+    optionValues;
 }
 exports.CreateSkuDto = CreateSkuDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'IPHONE-15-PRO-BLUE' }),
+    (0, swagger_1.ApiProperty)({ example: 'IPHONE-15-PRO-BLUE-256' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
@@ -75,16 +96,22 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateSkuDto.prototype, "stock", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: { Color: 'Blue', Capacity: '256GB' } }),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateSkuDto.prototype, "attributes", void 0);
+    (0, swagger_1.ApiProperty)({
+        type: [CreateSkuValueDto],
+        description: 'Mapping of this SKU to specific option values',
+    }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => CreateSkuValueDto),
+    __metadata("design:type", Array)
+], CreateSkuDto.prototype, "optionValues", void 0);
 class CreateProductDto {
     name;
     slug;
     description;
     basePrice;
     categoryId;
+    options;
     skus;
 }
 exports.CreateProductDto = CreateProductDto;
@@ -101,13 +128,13 @@ __decorate([
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "slug", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'The latest iPhone with titanium' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'The latest iPhone' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 899.99 }),
+    (0, swagger_1.ApiProperty)({ example: 999.99 }),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "basePrice", void 0);
@@ -118,10 +145,48 @@ __decorate([
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "categoryId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: [CreateProductOptionDto] }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => CreateProductOptionDto),
+    __metadata("design:type", Array)
+], CreateProductDto.prototype, "options", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ type: [CreateSkuDto] }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
     (0, class_transformer_1.Type)(() => CreateSkuDto),
     __metadata("design:type", Array)
 ], CreateProductDto.prototype, "skus", void 0);
+class CreateCategoryDto {
+    name;
+    slug;
+    description;
+    parentId;
+}
+exports.CreateCategoryDto = CreateCategoryDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Electronics' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateCategoryDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'electronics' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateCategoryDto.prototype, "slug", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Gadgets and more' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateCategoryDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'parent-uuid' }),
+    (0, class_validator_1.IsUUID)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateCategoryDto.prototype, "parentId", void 0);
 //# sourceMappingURL=catalog.dto.js.map

@@ -10,30 +10,45 @@ import {
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class CreateCategoryDto {
-  @ApiProperty({ example: 'Electronics' })
+export class CreateOptionValueDto {
+  @ApiProperty({ example: 'Blue' })
+  @IsString()
+  @IsNotEmpty()
+  value: string;
+
+  @ApiProperty({ example: 'Ocean Blue' })
+  @IsString()
+  @IsNotEmpty()
+  displayName: string;
+}
+
+export class CreateProductOptionDto {
+  @ApiProperty({ example: 'Color' })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: 'electronics' })
+  @Type(() => CreateOptionValueDto)
+  @IsArray()
+  @ValidateNested({ each: true })
+  @ApiProperty({ type: [CreateOptionValueDto] })
+  values: CreateOptionValueDto[];
+}
+
+export class CreateSkuValueDto {
+  @ApiProperty({ description: 'The value of the option, e.g., Blue' })
   @IsString()
   @IsNotEmpty()
-  slug: string;
+  optionName: string;
 
-  @ApiPropertyOptional({ example: 'All electronic gadgets' })
+  @ApiProperty({ description: 'The specific value selected, e.g., Blue' })
   @IsString()
-  @IsOptional()
-  description?: string;
-
-  @ApiPropertyOptional({ example: 'uuid-of-parent-category' })
-  @IsUUID()
-  @IsOptional()
-  parentId?: string;
+  @IsNotEmpty()
+  value: string;
 }
 
 export class CreateSkuDto {
-  @ApiProperty({ example: 'IPHONE-15-PRO-BLUE' })
+  @ApiProperty({ example: 'IPHONE-15-PRO-BLUE-256' })
   @IsString()
   @IsNotEmpty()
   sku: string;
@@ -51,9 +66,14 @@ export class CreateSkuDto {
   @IsNumber()
   stock: number;
 
-  @ApiProperty({ example: { Color: 'Blue', Capacity: '256GB' } })
-  @IsOptional()
-  attributes?: Record<string, any>;
+  @ApiProperty({
+    type: [CreateSkuValueDto],
+    description: 'Mapping of this SKU to specific option values',
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateSkuValueDto)
+  optionValues: CreateSkuValueDto[];
 }
 
 export class CreateProductDto {
@@ -67,12 +87,12 @@ export class CreateProductDto {
   @IsNotEmpty()
   slug: string;
 
-  @ApiPropertyOptional({ example: 'The latest iPhone with titanium' })
+  @ApiPropertyOptional({ example: 'The latest iPhone' })
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ example: 899.99 })
+  @ApiProperty({ example: 999.99 })
   @IsNumber()
   basePrice: number;
 
@@ -81,9 +101,37 @@ export class CreateProductDto {
   @IsOptional()
   categoryId?: string;
 
+  @ApiProperty({ type: [CreateProductOptionDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateProductOptionDto)
+  options: CreateProductOptionDto[];
+
   @ApiProperty({ type: [CreateSkuDto] })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateSkuDto)
   skus: CreateSkuDto[];
+}
+
+export class CreateCategoryDto {
+  @ApiProperty({ example: 'Electronics' })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ApiProperty({ example: 'electronics' })
+  @IsString()
+  @IsNotEmpty()
+  slug: string;
+
+  @ApiPropertyOptional({ example: 'Gadgets and more' })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiPropertyOptional({ example: 'parent-uuid' })
+  @IsUUID()
+  @IsOptional()
+  parentId?: string;
 }

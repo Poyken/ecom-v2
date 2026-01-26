@@ -29,18 +29,13 @@ let CatalogService = class CatalogService {
     async createCategory(dto) {
         const tenantId = this.getTenantId();
         const existing = await this.prisma.category.findUnique({
-            where: {
-                tenantId_slug: { tenantId, slug: dto.slug },
-            },
+            where: { tenantId_slug: { tenantId, slug: dto.slug } },
         });
         if (existing) {
-            throw new common_1.ConflictException('Category slug already exists in this tenant');
+            throw new common_1.ConflictException('Category slug already exists');
         }
         return this.prisma.category.create({
-            data: {
-                ...dto,
-                tenantId,
-            },
+            data: { ...dto, tenantId },
         });
     }
     async findAllCategories() {
@@ -52,34 +47,70 @@ let CatalogService = class CatalogService {
     }
     async createProduct(dto) {
         const tenantId = this.getTenantId();
-        const { skus, ...productData } = dto;
+        const { options, skus, ...productData } = dto;
         const existing = await this.prisma.product.findUnique({
-            where: {
-                tenantId_slug: { tenantId, slug: dto.slug },
-            },
+            where: { tenantId_slug: { tenantId, slug: dto.slug } },
         });
         if (existing) {
-            throw new common_1.ConflictException('Product slug already exists in this tenant');
+            throw new common_1.ConflictException('Product slug already exists');
         }
         return this.prisma.$transaction(async (tx) => {
             const product = await tx.product.create({
                 data: {
                     ...productData,
                     tenantId,
-                    skus: {
-                        create: skus.map((sku) => ({
-                            sku: sku.sku,
-                            price: sku.price,
-                            comparePrice: sku.comparePrice,
-                            stock: sku.stock,
-                            attributes: sku.attributes ?? {},
+                    options: {
+                        create: options.map((opt) => ({
+                            name: opt.name,
                             tenantId,
+                            values: {
+                                create: opt.values.map((v) => ({
+                                    value: v.value,
+                                    displayName: v.displayName,
+                                    tenantId,
+                                })),
+                            },
                         })),
                     },
                 },
-                include: { skus: true },
+                include: {
+                    options: {
+                        include: { values: true },
+                    },
+                },
             });
-            return product;
+            const valueMap = new Map();
+            product.options.forEach((opt) => {
+                opt.values.forEach((val) => {
+                    valueMap.set(`${opt.name}:${val.value}`, val.id);
+                });
+            });
+            for (const skuDto of skus) {
+                const sku = await tx.sku.create({
+                    data: {
+                        sku: skuDto.sku,
+                        price: skuDto.price,
+                        comparePrice: skuDto.comparePrice,
+                        stock: skuDto.stock,
+                        tenantId,
+                        productId: product.id,
+                    },
+                });
+                for (const ov of skuDto.optionValues) {
+                    const optionValueId = valueMap.get(`${ov.optionName}:${ov.value}`);
+                    if (!optionValueId) {
+                        throw new common_1.NotFoundException(`Option value ${ov.optionName}:${ov.value} not found`);
+                    }
+                    await tx.skuValue.create({
+                        data: {
+                            tenantId,
+                            skuId: sku.id,
+                            optionValueId,
+                        },
+                    });
+                }
+            }
+            return this.findProductBySlug(product.slug);
         });
     }
     async findAllProducts() {
@@ -87,21 +118,41 @@ let CatalogService = class CatalogService {
         return this.prisma.product.findMany({
             where: { tenantId, isActive: true },
             include: {
-                skus: { where: { isActive: true } },
                 category: true,
+                skus: {
+                    include: {
+                        skuValues: {
+                            include: {
+                                optionValue: {
+                                    include: { option: true },
+                                },
+                            },
+                        },
+                    },
+                },
             },
         });
     }
     async findProductBySlug(slug) {
         const tenantId = this.getTenantId();
         const product = await this.prisma.product.findUnique({
-            where: {
-                tenantId_slug: { tenantId, slug },
-            },
+            where: { tenantId_slug: { tenantId, slug } },
             include: {
-                skus: { where: { isActive: true } },
                 category: true,
-                options: { include: { values: true } },
+                options: {
+                    include: { values: true },
+                },
+                skus: {
+                    include: {
+                        skuValues: {
+                            include: {
+                                optionValue: {
+                                    include: { option: true },
+                                },
+                            },
+                        },
+                    },
+                },
             },
         });
         if (!product) {

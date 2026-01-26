@@ -30,7 +30,48 @@ export declare class CatalogController {
         sortOrder: number;
     }[]>;
     createProduct(dto: CreateProductDto): Promise<{
-        skus: {
+        category: {
+            description: string | null;
+            id: string;
+            tenantId: string;
+            isActive: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            slug: string;
+            parentId: string | null;
+            image: string | null;
+            sortOrder: number;
+        } | null;
+        skus: ({
+            skuValues: ({
+                optionValue: {
+                    option: {
+                        id: string;
+                        tenantId: string;
+                        createdAt: Date;
+                        updatedAt: Date;
+                        name: string;
+                        sortOrder: number;
+                        productId: string;
+                    };
+                } & {
+                    id: string;
+                    tenantId: string;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    value: string;
+                    displayName: string;
+                    sortOrder: number;
+                    optionId: string;
+                };
+            } & {
+                id: string;
+                tenantId: string;
+                skuId: string;
+                optionValueId: string;
+            })[];
+        } & {
             sku: string;
             id: string;
             tenantId: string;
@@ -40,10 +81,29 @@ export declare class CatalogController {
             price: import("@prisma/client-runtime-utils").Decimal;
             comparePrice: import("@prisma/client-runtime-utils").Decimal | null;
             stock: number;
-            attributes: import("@prisma/client/runtime/client").JsonValue;
-            barcode: string | null;
             productId: string;
-        }[];
+            barcode: string | null;
+        })[];
+        options: ({
+            values: {
+                id: string;
+                tenantId: string;
+                createdAt: Date;
+                updatedAt: Date;
+                value: string;
+                displayName: string;
+                sortOrder: number;
+                optionId: string;
+            }[];
+        } & {
+            id: string;
+            tenantId: string;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            sortOrder: number;
+            productId: string;
+        })[];
     } & {
         description: string | null;
         id: string;
@@ -76,7 +136,35 @@ export declare class CatalogController {
             image: string | null;
             sortOrder: number;
         } | null;
-        skus: {
+        skus: ({
+            skuValues: ({
+                optionValue: {
+                    option: {
+                        id: string;
+                        tenantId: string;
+                        createdAt: Date;
+                        updatedAt: Date;
+                        name: string;
+                        sortOrder: number;
+                        productId: string;
+                    };
+                } & {
+                    id: string;
+                    tenantId: string;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    value: string;
+                    displayName: string;
+                    sortOrder: number;
+                    optionId: string;
+                };
+            } & {
+                id: string;
+                tenantId: string;
+                skuId: string;
+                optionValueId: string;
+            })[];
+        } & {
             sku: string;
             id: string;
             tenantId: string;
@@ -86,10 +174,9 @@ export declare class CatalogController {
             price: import("@prisma/client-runtime-utils").Decimal;
             comparePrice: import("@prisma/client-runtime-utils").Decimal | null;
             stock: number;
-            attributes: import("@prisma/client/runtime/client").JsonValue;
-            barcode: string | null;
             productId: string;
-        }[];
+            barcode: string | null;
+        })[];
     } & {
         description: string | null;
         id: string;
@@ -122,7 +209,35 @@ export declare class CatalogController {
             image: string | null;
             sortOrder: number;
         } | null;
-        skus: {
+        skus: ({
+            skuValues: ({
+                optionValue: {
+                    option: {
+                        id: string;
+                        tenantId: string;
+                        createdAt: Date;
+                        updatedAt: Date;
+                        name: string;
+                        sortOrder: number;
+                        productId: string;
+                    };
+                } & {
+                    id: string;
+                    tenantId: string;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    value: string;
+                    displayName: string;
+                    sortOrder: number;
+                    optionId: string;
+                };
+            } & {
+                id: string;
+                tenantId: string;
+                skuId: string;
+                optionValueId: string;
+            })[];
+        } & {
             sku: string;
             id: string;
             tenantId: string;
@@ -132,20 +247,19 @@ export declare class CatalogController {
             price: import("@prisma/client-runtime-utils").Decimal;
             comparePrice: import("@prisma/client-runtime-utils").Decimal | null;
             stock: number;
-            attributes: import("@prisma/client/runtime/client").JsonValue;
-            barcode: string | null;
             productId: string;
-        }[];
+            barcode: string | null;
+        })[];
         options: ({
             values: {
                 id: string;
                 tenantId: string;
                 createdAt: Date;
                 updatedAt: Date;
-                sortOrder: number;
-                optionId: string;
                 value: string;
                 displayName: string;
+                sortOrder: number;
+                optionId: string;
             }[];
         } & {
             id: string;
