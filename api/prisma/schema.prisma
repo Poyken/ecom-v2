@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id                    String    @id @default(uuid()) @db.Uuid
+  name                  String
+  domain                String    @unique
+  status                String    @default("active")
+  settings              Json      @default("{}")
+  subscriptionPlan      String    @default("starter") // starter, professional, enterprise
+  subscriptionExpiresAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  users                 User[]
+  categories            Category[]
+  brands                Brand[]
+  products              Product[]
+  skus                  Sku[]
+
+  @@map("tenants")
+}
+
+model User {
+  id               String    @id @default(uuid()) @db.Uuid
+  tenantId         String    @db.Uuid
+  email            String
+  passwordHash     String
+  firstName        String
+  lastName         String
+  role             String    @default("customer")
+  isActive         Boolean   @default(true)
+  emailVerified    Boolean   @default(false)
+  emailVerifiedAt  DateTime?
+  lastLoginAt      DateTime?
+  acceptTerms      Boolean   @default(false)
+  marketingConsent Boolean   @default(false)
+  metadata         Json      @default("{}")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  tenant           Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, email])
+  @@map("users")
+}
+
+model Category {
+  id          String     @id @default(uuid()) @db.Uuid
+  tenantId    String     @db.Uuid
+  parentId    String?    @db.Uuid
+  name        String
+  slug        String
+  description String?
+  image       String?
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  tenant      Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToCategory")
+  products    Product[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@map("categories")
+}
+
+model Brand {
+  id          String    @id @default(uuid()) @db.Uuid
+  tenantId    String    @db.Uuid
+  name        String
+  slug        String
+  description String?
+  logo        String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  products    Product[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@map("brands")
+}
+
+model Product {
+  id               String          @id @default(uuid()) @db.Uuid
+  tenantId         String          @db.Uuid
+  categoryId       String?         @db.Uuid
+  brandId          String?         @db.Uuid
+  name             String
+  slug             String
+  description      String?         @db.Text
+  shortDescription String?         @db.Text
+  images           Json            @default("[]")
+  status           String          @default("draft") // draft, published, archived
+  basePrice        Decimal         @db.Decimal(10, 2)
+  salePrice        Decimal?        @db.Decimal(10, 2)
+  isActive         Boolean         @default(false)
+  metadata         Json            @default("{}")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category         Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brand            Brand?          @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  options          ProductOption[]
+  skus             Sku[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([categoryId])
+  @@index([status])
+  @@map("products")
+}
+
+model ProductOption {
+  id        String        @id @default(uuid()) @db.Uuid
+  tenantId  String        @db.Uuid
+  productId String        @db.Uuid
+  name      String // e.g., Color, Size
+  sortOrder Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  values    OptionValue[]
+
+  @@index([productId])
+  @@map("product_options")
+}
+
+model OptionValue {
+  id          String        @id @default(uuid()) @db.Uuid
+  tenantId    String        @db.Uuid
+  optionId    String        @db.Uuid
+  value       String // e.g., Blue, XL
+  displayName String
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  option      ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@index([optionId])
+  @@map("option_values")
+}
+
+model Sku {
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId     String   @db.Uuid
+  productId    String   @db.Uuid
+  sku          String
+  barcode      String?
+  price        Decimal  @db.Decimal(10, 2)
+  comparePrice Decimal? @db.Decimal(10, 2)
+  stock        Int      @default(0)
+  attributes   Json     @default("{}") // e.g., {"Color": "Blue", "Size": "XL"}
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, sku])
+  @@index([productId])
+  @@map("skus")
+}
