@@ -82,8 +82,13 @@ export declare class CatalogService {
             price: import("@prisma/client-runtime-utils").Decimal;
             comparePrice: import("@prisma/client-runtime-utils").Decimal | null;
             stock: number;
+            costPrice: import("@prisma/client-runtime-utils").Decimal | null;
+            weight: import("@prisma/client-runtime-utils").Decimal | null;
+            dimensions: import("@prisma/client/runtime/client").JsonValue | null;
+            deletedAt: Date | null;
             productId: string;
             barcode: string | null;
+            trackInventory: boolean;
         })[];
         options: ({
             values: {
@@ -114,14 +119,21 @@ export declare class CatalogService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        tags: import("@prisma/client/runtime/client").JsonValue;
         status: string;
         slug: string;
         basePrice: import("@prisma/client-runtime-utils").Decimal;
         categoryId: string | null;
+        sortOrder: number;
         brandId: string | null;
         shortDescription: string | null;
         images: import("@prisma/client/runtime/client").JsonValue;
         salePrice: import("@prisma/client-runtime-utils").Decimal | null;
+        costPrice: import("@prisma/client-runtime-utils").Decimal | null;
+        weight: import("@prisma/client-runtime-utils").Decimal | null;
+        dimensions: import("@prisma/client/runtime/client").JsonValue | null;
+        publishedAt: Date | null;
+        deletedAt: Date | null;
     }>;
     findAllProducts(): Promise<({
         category: {
@@ -175,8 +187,13 @@ export declare class CatalogService {
             price: import("@prisma/client-runtime-utils").Decimal;
             comparePrice: import("@prisma/client-runtime-utils").Decimal | null;
             stock: number;
+            costPrice: import("@prisma/client-runtime-utils").Decimal | null;
+            weight: import("@prisma/client-runtime-utils").Decimal | null;
+            dimensions: import("@prisma/client/runtime/client").JsonValue | null;
+            deletedAt: Date | null;
             productId: string;
             barcode: string | null;
+            trackInventory: boolean;
         })[];
     } & {
         description: string | null;
@@ -187,14 +204,21 @@ export declare class CatalogService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        tags: import("@prisma/client/runtime/client").JsonValue;
         status: string;
         slug: string;
         basePrice: import("@prisma/client-runtime-utils").Decimal;
         categoryId: string | null;
+        sortOrder: number;
         brandId: string | null;
         shortDescription: string | null;
         images: import("@prisma/client/runtime/client").JsonValue;
         salePrice: import("@prisma/client-runtime-utils").Decimal | null;
+        costPrice: import("@prisma/client-runtime-utils").Decimal | null;
+        weight: import("@prisma/client-runtime-utils").Decimal | null;
+        dimensions: import("@prisma/client/runtime/client").JsonValue | null;
+        publishedAt: Date | null;
+        deletedAt: Date | null;
     })[]>;
     findProductBySlug(slug: string): Promise<{
         category: {
@@ -248,8 +272,13 @@ export declare class CatalogService {
             price: import("@prisma/client-runtime-utils").Decimal;
             comparePrice: import("@prisma/client-runtime-utils").Decimal | null;
             stock: number;
+            costPrice: import("@prisma/client-runtime-utils").Decimal | null;
+            weight: import("@prisma/client-runtime-utils").Decimal | null;
+            dimensions: import("@prisma/client/runtime/client").JsonValue | null;
+            deletedAt: Date | null;
             productId: string;
             barcode: string | null;
+            trackInventory: boolean;
         })[];
         options: ({
             values: {
@@ -280,13 +309,20 @@ export declare class CatalogService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        tags: import("@prisma/client/runtime/client").JsonValue;
         status: string;
         slug: string;
         basePrice: import("@prisma/client-runtime-utils").Decimal;
         categoryId: string | null;
+        sortOrder: number;
         brandId: string | null;
         shortDescription: string | null;
         images: import("@prisma/client/runtime/client").JsonValue;
         salePrice: import("@prisma/client-runtime-utils").Decimal | null;
+        costPrice: import("@prisma/client-runtime-utils").Decimal | null;
+        weight: import("@prisma/client-runtime-utils").Decimal | null;
+        dimensions: import("@prisma/client/runtime/client").JsonValue | null;
+        publishedAt: Date | null;
+        deletedAt: Date | null;
     }>;
 }

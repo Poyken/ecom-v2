@@ -14,6 +14,7 @@ const auth_module_1 = require("./modules/auth/auth.module");
 const tenant_middleware_1 = require("./common/tenant/tenant.middleware");
 const tenant_module_1 = require("./modules/tenant/tenant.module");
 const catalog_module_1 = require("./modules/catalog/catalog.module");
+const inventory_module_1 = require("./modules/inventory/inventory.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(tenant_middleware_1.TenantMiddleware).forRoutes('*path');
@@ -28,6 +29,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             tenant_module_1.TenantModule,
             catalog_module_1.CatalogModule,
+            inventory_module_1.InventoryModule,
         ],
     })
 ], AppModule);
