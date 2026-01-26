@@ -1,4 +1,7 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import {
+  Inject,
   Injectable,
   ConflictException,
   NotFoundException,
@@ -10,7 +13,10 @@ import { CreateCategoryDto, CreateProductDto } from './dto/catalog.dto';
 
 @Injectable()
 export class CatalogService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   private getTenantId(): string {
     const context = tenantStorage.getStore();
@@ -125,13 +131,18 @@ export class CatalogService {
         }
       }
 
+      await this.cacheManager.del(`products:${tenantId}`); // Invalidate list cache
       return this.findProductBySlug(product.slug);
     });
   }
 
   async findAllProducts() {
     const tenantId = this.getTenantId();
-    return this.prisma.product.findMany({
+    const cacheKey = `products:${tenantId}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
+
+    const products = await this.prisma.product.findMany({
       where: { tenantId, isActive: true },
       include: {
         category: true,
@@ -148,10 +159,17 @@ export class CatalogService {
         },
       },
     });
+
+    await this.cacheManager.set(cacheKey, products, 300000); // Cache for 5 minutes
+    return products;
   }
 
   async findProductBySlug(slug: string) {
     const tenantId = this.getTenantId();
+    const cacheKey = `product:${tenantId}:${slug}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
+
     const product = await this.prisma.product.findUnique({
       where: { tenantId_slug: { tenantId, slug } },
       include: {
@@ -177,6 +195,7 @@ export class CatalogService {
       throw new NotFoundException('Product not found');
     }
 
+    await this.cacheManager.set(cacheKey, product, 300000); // Cache for 5 minutes
     return product;
   }
 }
