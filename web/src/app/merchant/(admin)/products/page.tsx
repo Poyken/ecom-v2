@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { Package, Plus, MoreVertical, Tag } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -29,10 +30,10 @@ export default function ProductsPage() {
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-muted-foreground">Manage your catalog and matrix variants.</p>
         </div>
-        <button className="px-4 py-2 bg-primary text-primary-foreground rounded-xl font-bold flex items-center gap-2">
+        <Link href="/merchant/products/new" className="px-4 py-2 bg-primary text-primary-foreground rounded-xl font-bold flex items-center gap-2">
           <Plus className="w-4 h-4" />
           Create Product
-        </button>
+        </Link>
       </header>
 
       <div className="bg-card border rounded-2xl overflow-hidden shadow-sm">

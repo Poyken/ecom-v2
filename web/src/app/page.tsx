@@ -10,13 +10,17 @@ import {
   Zap, 
   ShieldCheck, 
   Truck,
-  ShoppingCart
+  ShoppingCart,
+  Plus
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useCart } from '@/components/cart-provider';
 
 export default function Storefront() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { addToCart, items } = useCart();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,12 +36,39 @@ export default function Storefront() {
     fetchProducts();
   }, []);
 
+  const handleAddToCart = (product: any, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Logic to select Default SKU or first available SKU
+    const sku = product.skus?.[0];
+    
+    if (!sku) {
+       alert('Product out of stock or not configured correctly');
+       return;
+    }
+
+    addToCart({
+      skuId: sku.id,
+      productId: product.id,
+      name: product.name,
+      price: Number(sku.price), // Ensure number
+      sku: sku.sku,
+      quantity: 1,
+    });
+    
+    // Optional: Toast or feedback?
+    // Using simple alert for now if needed, or just relying on cart count update
+  };
+  
+  const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Dynamic Navbar */}
       <nav className="sticky top-0 z-50 glass h-20 px-8 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <h1 className="text-2xl font-black italic premium-gradient bg-clip-text text-transparent">GALAXY STORE</h1>
+          <Link href="/" className="text-2xl font-black italic premium-gradient bg-clip-text text-transparent">GALAXY STORE</Link>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
             <a href="#" className="hover:text-primary transition-colors">Categories</a>
             <a href="#" className="hover:text-primary transition-colors">Deals</a>
@@ -50,13 +81,17 @@ export default function Storefront() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input className="pl-10 pr-4 py-2 rounded-full bg-muted/30 border-none w-64 text-sm outline-none focus:ring-2 focus:ring-primary/20" placeholder="Search tech..." />
           </div>
-          <button className="relative p-2 hover:bg-muted/50 rounded-full transition-colors">
+          <Link href="/checkout" className="relative p-2 hover:bg-muted/50 rounded-full transition-colors">
             <ShoppingCart className="w-6 h-6" />
-            <span className="absolute top-0 right-0 w-4 h-4 bg-primary text-[10px] text-white flex items-center justify-center rounded-full font-bold">3</span>
-          </button>
-          <button className="px-5 py-2 secondary premium-gradient text-white rounded-full font-semibold text-sm shadow-lg shadow-purple-500/20 active:scale-95 transition-all">
-            Login
-          </button>
+            {cartCount > 0 && (
+              <span className="absolute top-0 right-0 w-4 h-4 bg-primary text-[10px] text-white flex items-center justify-center rounded-full font-bold">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+          <Link href="/auth/login" className="px-5 py-2 secondary premium-gradient text-white rounded-full font-semibold text-sm shadow-lg shadow-purple-500/20 active:scale-95 transition-all">
+            Đăng nhập
+          </Link>
         </div>
       </nav>
 
@@ -79,22 +114,22 @@ export default function Storefront() {
         >
           <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 backdrop-blur w-fit border border-primary/30 text-primary-foreground text-xs font-bold uppercase tracking-widest">
             <Zap className="w-3 h-3" />
-            New Season Launch
+            Ra mắt Mùa mới
           </div>
           <h2 className="text-7xl font-bold leading-tight">
-            Next Generation <br /> 
+            Thế hệ tiếp theo <br /> 
             <span className="premium-gradient bg-clip-text text-transparent italic">Smart Living.</span>
           </h2>
           <p className="text-xl text-zinc-300 leading-relaxed max-w-lg">
-            Experience the future of commerce with our B2B2C integrated catalog. High efficiency, matrix variants, and secure payments.
+            Trải nghiệm tương lai của thương mại với danh mục tích hợp B2B2C. Hiệu quả cao, biến thể ma trận và thanh toán an toàn.
           </p>
           <div className="flex gap-4">
             <button className="px-8 py-4 bg-primary text-white font-bold rounded-xl flex items-center gap-2 group hover:gap-4 transition-all shadow-xl shadow-primary/40">
-              Shop Now
+              Mua ngay
               <ChevronRight className="w-5 h-5" />
             </button>
             <button className="px-8 py-4 bg-white/10 backdrop-blur border border-white/20 text-white font-bold rounded-xl hover:bg-white/20 transition-all">
-              Watch Demo
+              Xem Demo
             </button>
           </div>
         </motion.div>
@@ -103,10 +138,10 @@ export default function Storefront() {
       {/* Features Bar */}
       <div className="py-12 px-12 grid grid-cols-2 md:grid-cols-4 gap-8 bg-card border-b">
         {[
-          { icon: Truck, label: 'Free Logistics' },
-          { icon: ShieldCheck, label: 'Secured VNPay' },
-          { icon: Star, label: 'Premium Quality' },
-          { icon: Zap, label: 'Matrix Variants' }
+          { icon: Truck, label: 'Vận chuyển Miễn phí' },
+          { icon: ShieldCheck, label: 'Bảo mật VNPay' },
+          { icon: Star, label: 'Chất lượng Cao cấp' },
+          { icon: Zap, label: 'Biến thể Ma trận' }
         ].map((item, idx) => (
           <div key={idx} className="flex items-center gap-4 group cursor-default">
             <div className="p-3 rounded-2xl bg-muted group-hover:bg-primary/20 transition-colors">
@@ -120,9 +155,9 @@ export default function Storefront() {
       {/* Product Grid */}
       <main className="py-20 px-12 space-y-12">
         <div className="flex items-center justify-between">
-          <h3 className="text-3xl font-bold">Featured Catalog</h3>
+          <h3 className="text-3xl font-bold">Sản phẩm Nổi bật</h3>
           <a href="#" className="text-primary font-bold flex items-center gap-1 hover:gap-2 transition-all">
-            View All Collection <ChevronRight className="w-4 h-4" />
+            Xem tất cả <ChevronRight className="w-4 h-4" />
           </a>
         </div>
 
@@ -134,8 +169,8 @@ export default function Storefront() {
           ) : products.length === 0 ? (
             <div className="col-span-full py-20 text-center border-2 border-dashed rounded-3xl text-muted-foreground">
                <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-10" />
-               <p className="text-xl">No products available in this tenant yet.</p>
-               <p className="text-sm">Storefront correctly configured for tenant isolation.</p>
+               <p className="text-xl">Chưa có sản phẩm nào trong tenant này.</p>
+               <p className="text-sm">Storefront đã được cấu hình đúng để cách ly tenant.</p>
             </div>
           ) : (
             products.map((product, idx) => (
@@ -161,7 +196,10 @@ export default function Storefront() {
                   <p className="text-sm text-muted-foreground line-clamp-2">{product.description || 'Modern high-performance device for next-gen enterprises.'}</p>
                   <div className="pt-4 flex items-center justify-between border-t border-dashed">
                     <span className="text-2xl font-black">${product.basePrice}</span>
-                    <button className="w-12 h-12 rounded-2xl premium-gradient text-white flex items-center justify-center shadow-lg shadow-purple-500/30 active:scale-90 transition-all">
+                    <button 
+                      onClick={(e) => handleAddToCart(product, e)}
+                      className="w-12 h-12 rounded-2xl premium-gradient text-white flex items-center justify-center shadow-lg shadow-purple-500/30 active:scale-90 transition-all"
+                    >
                       <Plus className="w-6 h-6" />
                     </button>
                   </div>
@@ -172,25 +210,5 @@ export default function Storefront() {
         </div>
       </main>
     </div>
-  );
-}
-
-function Plus(props: any) {
-  return (
-    <svg 
-      {...props} 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <line x1="12" y1="5" x2="12" y2="19"></line>
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-    </svg>
   );
 }

@@ -69,6 +69,7 @@ export class CatalogService {
       const product = await tx.product.create({
         data: {
           ...productData,
+          isActive: true,
           tenantId,
           options: {
             create: options.map((opt) => ({
@@ -114,10 +115,13 @@ export class CatalogService {
 
         // Link SKU to its specific option values
         for (const ov of skuDto.optionValues) {
-          const optionValueId = valueMap.get(`${ov.optionName}:${ov.value}`);
+          // Fix: Ensure we match against the correct key format constructed earlier: "OptionName:Value"
+          const key = `${ov.optionName}:${ov.value}`;
+          const optionValueId = valueMap.get(key);
           if (!optionValueId) {
+            console.error(`Available keys: ${Array.from(valueMap.keys()).join(', ')}`);
             throw new NotFoundException(
-              `Option value ${ov.optionName}:${ov.value} not found`,
+              `Option value ${key} not found.`,
             );
           }
 
@@ -131,8 +135,30 @@ export class CatalogService {
         }
       }
 
-      await this.cacheManager.del(`products:${tenantId}`); // Invalidate list cache
-      return this.findProductBySlug(product.slug);
+      // 4. Invalidate Cache
+      await this.cacheManager.del(`products:${tenantId}`);
+
+      // 5. Return the full product structure using the Transaction Client to ensure visibility
+      return tx.product.findUnique({
+        where: { id: product.id },
+        include: {
+          category: true,
+          options: {
+            include: { values: true },
+          },
+          skus: {
+            include: {
+              skuValues: {
+                include: {
+                  optionValue: {
+                    include: { option: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
     });
   }
 

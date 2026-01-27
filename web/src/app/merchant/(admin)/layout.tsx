@@ -22,11 +22,11 @@ export default function MerchantLayout({
   const pathname = usePathname();
 
   const menuItems = [
-    { title: 'Home', icon: LayoutDashboard, href: '/merchant/dashboard' },
-    { title: 'Products', icon: Package, href: '/merchant/products' },
-    { title: 'Orders', icon: ShoppingCart, href: '/merchant/orders' },
-    { title: 'Inventory', icon: Warehouse, href: '/merchant/inventory' },
-    { title: 'Settings', icon: Settings, href: '/merchant/settings' },
+    { title: 'Tổng quan (Dashboard)', icon: LayoutDashboard, href: '/merchant/dashboard' },
+    { title: 'Sản phẩm', icon: Package, href: '/merchant/products' },
+    { title: 'Đơn hàng', icon: ShoppingCart, href: '/merchant/orders' },
+    { title: 'Kho hàng', icon: Warehouse, href: '/merchant/inventory' },
+    { title: 'Cài đặt', icon: Settings, href: '/merchant/settings' },
   ];
 
   return (
