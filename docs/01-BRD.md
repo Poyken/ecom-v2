@@ -6,16 +6,18 @@
 
 ### Tóm tắt Điều hành
 
-**Tên dự án**: Nền tảng E-commerce Multi-tenant MVP  
-**Phiên bản**: 2.0 (Solo Dev Edition)  
+### Tóm tắt Điều hành
+
+**Tên dự án**: Next-Gen Commerce Platform  
+**Phiên bản**: 3.0 (Competitive Startup)  
 **Ngày**: 28 tháng 1, 2026  
-**Tác giả**: Solo Developer  
-**Chiến lược**: MVP-first với Managed Services
+**Chiến lược**: AI-Driven, Mobile-Native, Hyper-Fast
 
 > [!IMPORTANT]
-> **Solo Developer Strategy**: Dự án được phát triển bởi một developer duy nhất. Xem `decisions.md#7` và `.agent/rules/solo-dev-constraints.md` cho chi tiết.
+> **Product Positioning**: Không cạnh tranh bằng số lượng tính năng, cạnh tranh bằng **Trải nghiệm (UX)** và **Sự thông minh (AI)**.
+> Mục tiêu: Tạo ra nền tảng thương mại điện tử mượt mà nhất, thông minh nhất cho thị trường Việt Nam.
 
-Tài liệu này vạch ra các yêu cầu kinh doanh cho MVP của nền tảng e-commerce multi-tenant. **Focus MVP**: B2C tại thị trường Việt Nam với VNPay integration. Các tính năng B2B, AI search, multi-warehouse sẽ triển khai ở Phase 2-3.
+Tài liệu này vạch ra yêu cầu cho một sản phẩm Startup cạnh tranh. MVP tập trung vào **Commerce Core + AI Search** để tạo sự khác biệt ngay từ ngày đầu. B2C Focus.
 
 ---
 
@@ -50,27 +52,23 @@ Tài liệu này vạch ra các yêu cầu kinh doanh cho MVP của nền tảng
 
 ---
 
-### Mục tiêu Kinh doanh (Solo Dev MVP)
+### Mục tiêu Sản phẩm (Competitive Standard)
 
-#### Mục tiêu MVP (4 tháng)
+#### 1. Trải nghiệm người dùng (UX) - "Zero Friction"
 
-1. **Ra mắt MVP**: 4 tháng với **10-20 tenants** beta
-2. **Doanh thu đầu tiên**: Đạt **$500 MRR** trong 6 tháng
-3. **Người dùng**: **500 khách hàng cuối** hoạt động
-4. **Ổn định**: 99% uptime với tải trang < 3 giây
+- **Instant Load**: Thời gian phản hồi < 100ms (Optimistic UI).
+- **Mobile-Native**: Cảm giác vuốt chạm như Native App (PWA).
+- **One-Tap Checkout**: Tối giản hóa quy trình thanh toán.
 
-#### Mục tiêu Phase 2 (tháng 5-8)
+#### 2. Công nghệ dẫn dắt (Tech USP)
 
-1. Mở rộng lên **50+ tenants**
-2. Thêm **variants/SKU** support
-3. Đạt **$2K MRR**
+- **Smart Search (Algolia)**: Tìm kiếm siêu tốc có khả năng chịu lỗi chính tả (Typo Tolerance) và bộ lọc đa chiều (Faceting) ngay lập tức.
+- **Smart Recommendations**: Gợi ý sản phẩm "Thường được mua cùng" dựa trên rule engine đơn giản.
 
-#### ~~Mục tiêu Cũ (Không áp dụng cho MVP)~~
+#### 3. Chỉ số Kinh doanh (Startup Metrics)
 
-- ~~100+ tenants trong 6 tháng~~
-- ~~$1M ARR trong 18 tháng~~
-- ~~Đa tiền tệ, đa ngôn ngữ~~
-- ~~AI search, recommendations~~
+- **Time-to-product**: User tìm thấy sản phẩm trong < 3 thao tác.
+- **Retention**: Tăng 20% nhờ trải nghiệm search không-thất-bại (Zero result page strategy).
 
 ---
 
@@ -203,27 +201,20 @@ Tài liệu này vạch ra các yêu cầu kinh doanh cho MVP của nền tảng
 
 ---
 
-### Ngân sách & Lộ trình
+### Ngân sách & Lộ trình (Solo Dev Bootstrap)
 
-#### Ngân sách Phát triển: $500,000
+#### Ngân sách Phát triển: ~$100/tháng
 
-- **Chi phí Đội ngũ**: $350,000 (6 lập trình viên, 1 PM, 1 DevOps)
-- **Hạ tầng**: $75,000 (Dịch vụ đám mây, giám sát, công cụ)
-- **Dịch vụ Bên thứ ba**: $50,000 (Cổng thanh toán, dịch vụ AI)
-- **Dự phòng**: $25,000 (15% tổng cộng)
+- **Hạ tầng**: ~$20 (Render + Neon + Algolia overload)
+- **Tooling**: ~$30 (Copilot, V0, etc.)
+- **Marketing**: ~$50 (Ads thử nghiệm)
 
-#### Lộ trình: 6 Tháng đến MVP
+#### Lộ trình: 4 Tháng (Xem chi tiết Implementation Plan)
 
-- **Giai đoạn 1 (Tháng 1-2)**: Kiến trúc cốt lõi, quản lý người dùng, sản phẩm cơ bản
-- **Giai đoạn 2 (Tháng 3-4)**: Quản lý đơn hàng, thanh toán, vận chuyển
-- **Giai đoạn 3 (Tháng 5-6)**: Tính năng nâng cao, tích hợp AI, kiểm thử
-
-#### Chi phí Vận hành Hàng tháng: $50,000/tháng
-
-- **Hạ tầng**: $20,000
-- **Dịch vụ Bên thứ ba**: $15,000
-- **Hỗ trợ & Bảo trì**: $10,000
-- **Marketing & Bán hàng**: $5,000
+- **Phase 0**: Foundation (Tuần 1-2)
+- **Phase 1**: Core & Search (Tuần 3-6)
+- **Phase 2**: Commerce Logic (Tuần 7-9)
+- **Phase 3**: Launch (Tuần 13-16)
 
 ---
 
@@ -272,17 +263,15 @@ Tài liệu này vạch ra các yêu cầu kinh doanh cho MVP của nền tảng
 
 #### Thành công của MVP
 
-- 100+ tenant trả phí trong vòng 3 tháng sau khi ra mắt
-- 99,9% thời gian hoạt động của nền tảng
-- Tốc độ tải trang trung bình <2 giây
-- Phản hồi tích cực từ người dùng (đánh giá 4.0+)
+- **10-20 tenants** beta active.
+- **$500 MRR** trong 6 tháng đầu.
+- **Uptime 99%** (Không yêu cầu 99.9% cho MVP).
+- **Search Latency < 100ms** (Key USP).
 
 #### Thành công Dài hạn
 
-- 1,000+ tenant trong vòng 18 tháng
-- $1M ARR trong vòng 18 tháng
-- <5% tỷ lệ rời bỏ hàng tháng
-- Bộ tính năng dẫn đầu thị trường
+- **50+ tenants** sau 1 năm.
+- **Hệ sinh thái Plugin** bắt đầu hình thành.
 
 ---
 

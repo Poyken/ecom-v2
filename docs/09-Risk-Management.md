@@ -36,11 +36,12 @@
 
 ### Rủi ro Kinh doanh
 
-| Rủi ro             | Mức độ  | Biện pháp                                     |
-| :----------------- | :-----: | :-------------------------------------------- |
-| **Không có users** |  🟡 TB  | Soft launch với network, free beta program    |
-| **Cạnh tranh**     | 🟢 Thấp | Niche VN market, pricing cạnh tranh (99K VNĐ) |
-| **VNPay issues**   | 🟢 Thấp | Sandbox testing kỹ, backup COD option         |
+| Rủi ro             | Mức độ  | Biện pháp                                                                |
+| :----------------- | :-----: | :----------------------------------------------------------------------- |
+| **Không có users** |  🟡 TB  | Soft launch với network, free beta program                               |
+| **Algolia Cost**   |  🟡 TB  | Dùng Free Tier (10k records). Tối ưu index size. Cache kết quả phổ biến. |
+| **Cạnh tranh**     | 🟢 Thấp | Niche VN market, pricing cạnh tranh (99K VNĐ)                            |
+| **VNPay issues**   | 🟢 Thấp | Sandbox testing kỹ, backup COD option                                    |
 
 ---
 

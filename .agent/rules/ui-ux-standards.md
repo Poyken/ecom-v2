@@ -34,3 +34,4 @@ The platform uses a **Monochrome/Professional** aesthetic to allow for white-lab
 - **Contrast**: Minimum 4.5:1 ratio.
 - **Images**: Mandatory `WebP` format with `loading="lazy"`.
 - **Keyboard**: Full navigation support (Tab indexing).
+- **Mobile**: Touch targets must be >= 44px. PWA Manifest required.

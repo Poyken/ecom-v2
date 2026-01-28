@@ -6,13 +6,14 @@
 
 ### Thông tin tài liệu
 
-**Phiên bản**: 2.0 (Solo Dev Edition)  
+**Phiên bản**: 3.0 (Competitive Startup - Solo MVP)  
 **Ngày**: 28 tháng 1, 2026  
 **Tác giả**: Solo Developer  
-**Trạng thái**: MVP Scope
+**Trạng thái**: Locked for Execution
 
 > [!IMPORTANT]
-> **MVP Legend**: ✅ = MVP | ⚠️ = Simplified | ❌ = Phase 2+
+> **MVP Scope**: Chỉ hỗ trợ các tính năng cốt lõi nhất để đảm bảo chất lượng.
+> ❌ No Variants | ❌ No Multi-warehouse | ❌ No Loyalty Program
 
 ---
 
@@ -68,8 +69,9 @@
 
 - Tạo vai trò tùy chỉnh với quyền hạn chi tiết
 - Gán quyền cho vai trò (đọc, ghi, xóa, admin)
-- Hỗ trợ kế thừa và phân cấp vai trò
-- Kiểm tra quyền động tại thời điểm chạy (runtime)
+- Hỗ trợ k### Các Module Khác (Phase 2)
+  (Đã lược bỏ các phần B2B/Vector Search cũ)
+  (runtime)
 - Mẫu quyền hạn cho các trường hợp sử dụng phổ biến
 - Nhật ký kiểm toán cho các thay đổi về quyền hạn
 
@@ -90,12 +92,12 @@
 
 **Tiêu chí Chấp nhận**:
 
-- Tạo sản phẩm với nhiều biến thể (kích thước, màu sắc, v.v.)
-- Quản lý thông tin sản phẩm (tên, mô tả, hình ảnh, giá cả)
+- Tạo sản phẩm đơn giản (Không biến thể)
+- Quản lý thông tin sản phẩm (tên, mô tả, hình ảnh, giá cả, tồn kho đơn giản)
 - Hoạt động sản phẩm hàng loạt (nhập, xuất, cập nhật)
 - Phân loại và gắn thẻ sản phẩm
-- Theo dõi tồn kho theo từng biến thể
 - Quản lý trạng thái sản phẩm (nháp, hoạt động, lưu trữ)
+- **Auto-Sync**: Tự động đồng bộ sang Algolia khi lưu.
 
 **Quy tắc Kinh doanh**:
 
@@ -212,95 +214,11 @@
 
 ---
 
-#### 4. Module Quản lý Tồn kho & Kho hàng
+#### 4. Module Tồn kho & Marketing (Phase 2 - Scope Out)
 
-##### 4.1 Tồn kho Đa kho
-
-**User Story**: Là quản lý cửa hàng, tôi muốn theo dõi tồn kho trên nhiều kho hàng để có thể tối ưu hóa mức tồn kho.
-
-**Tiêu chí Chấp nhận**:
-
-- Tạo và quản lý nhiều vị trí kho hàng
-- Theo dõi mức tồn kho theo từng kho và SKU
-- Chuyển đổi tồn kho giữa các kho
-- Cảnh báo tồn kho thấp và các điểm đặt hàng lại
-- Điều chỉnh tồn kho và nhật ký kiểm toán
-- Đồng bộ hóa tồn kho theo thời gian thực
-
-**Quy tắc Kinh doanh**:
-
-- Mỗi SKU phải có tồn kho ở ít nhất một kho hàng
-- Việc chuyển kho yêu cầu phê duyệt
-- Điều chỉnh tồn kho yêu cầu mã lý do
-- Kiểm kê kho vật lý phải được thực hiện hàng quý
-- Không cho phép tồn kho âm
-
-##### 4.2 Quản lý Kho hàng
-
-**User Story**: Là quản lý vận hành, tôi muốn quản lý mức tồn kho hiệu quả để ngăn ngừa tình trạng hết hàng.
-
-**Tiêu chí Chấp nhận**:
-
-- Tự động giữ chỗ tồn kho khi đặt đơn hàng
-- Giải phóng tồn kho khi hủy đơn hàng
-- Quản lý đơn hàng chờ (backorder) và thông báo
-- Lịch sử biến động kho và báo cáo
-- Dự báo và lập kế hoạch nhu cầu
-- Quản lý nhà cung cấp và đơn đặt mua hàng
-
-**Quy tắc Kinh doanh**:
-
-- Tồn kho được giữ chỗ ngay khi tạo đơn hàng
-- Đơn hàng chờ chỉ được phép cho các sản phẩm cụ thể
-- Biến động kho là bất biến với các dấu vết kiểm toán
-- Mức tồn kho an toàn có thể cấu hình cho mỗi sản phẩm
-- Đơn đặt hàng mua tự động tạo dựa trên các điểm đặt hàng lại
-
----
-
-#### 5. Module Marketing & Khuyến mãi
-
-##### 5.1 Công cụ Khuyến mãi
-
-**User Story**: Là quản lý marketing, tôi muốn tạo các khuyến mãi linh hoạt để thúc đẩy doanh số và sự tương tác của khách hàng.
-
-**Tiêu chí Chấp nhận**:
-
-- Tạo quy tắc giảm giá (phần trăm, số tiền cố định, miễn phí vận chuyển)
-- Thiết lập điều kiện khuyến mãi (đơn hàng tối thiểu, danh mục sản phẩm, nhóm khách hàng)
-- Lập lịch khuyến mãi với ngày bắt đầu/kết thúc
-- Quy tắc khuyến mãi cộng dồn với thứ tự ưu tiên
-- Giới hạn sử dụng và các ràng buộc khuyến mãi
-- Phân tích hiệu quả khuyến mãi
-
-**Quy tắc Kinh doanh**:
-
-- Các khuyến mãi không được chồng chéo gây ra giá âm
-- Giảm giá tối đa là 100% giá sản phẩm
-- Mã khuyến mãi không phân biệt chữ hoa chữ thường
-- Mỗi khách hàng chỉ có thể sử dụng khuyến mãi một lần trừ khi có quy định khác
-- Khuyến mãi hết hạn sẽ tự động không hoạt động
-
-##### 5.2 Chương trình Khách hàng Thân thiết
-
-**User Story**: Là chủ cửa hàng, tôi muốn thưởng cho khách hàng trung thành để có thể tăng tỷ lệ giữ chân và mua lại.
-
-**Tiêu chí Chấp nhận**:
-
-- Quy tắc tích điểm cho mỗi số tiền mua hàng
-- Hệ thống đổi điểm với tỷ lệ chuyển đổi
-- Quyền lợi khách hàng thân thiết theo tầng (tiers)
-- Quản lý hết hạn điểm
-- Phân tích chương trình khách hàng thân thiết
-- Giao tiếp với khách hàng cho các sự kiện thân thiết
-
-**Quy tắc Kinh doanh**:
-
-- Điểm được tích khi hoàn thành đơn hàng (không phải khi đặt hàng)
-- Điểm hết hạn sau 12 tháng không hoạt động
-- Không tích điểm trên thuế hoặc phí vận chuyển
-- Quyền lợi tầng bậc có tính tích lũy
-- Điểm được hoàn trả khi hủy đơn hàng
+> [!NOTE]
+> Các tính năng Multi-warehouse, Loyalty, và Advanced Promotion tạm thời Scope Out để tập trung vào Core Commerce.
+> Xem `archive_enterprise` nếu cần tham khảo logic cũ.
 
 ---
 

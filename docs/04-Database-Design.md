@@ -81,6 +81,7 @@ model Order {
   id          String      @id @default(uuid())
   tenantId    String
   userId      String?
+  customerInfo Json?    // { email, name, phone, address } for Guest
   total       Decimal
   status      OrderStatus @default(PENDING)
   items       OrderItem[]

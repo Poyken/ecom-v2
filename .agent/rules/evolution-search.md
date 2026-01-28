@@ -5,11 +5,10 @@
 - **Discovery**: If a repetitive task is identified (e.g., configuring a new shipping provider), the Agent should offer to create a new Skill or Script in `.agent/skills/`.
 - **Expansion**: Every new implementation should be documented as a reference pattern for future use.
 
-## 2. Semantic Code Search Protocol
+## 2. Search Implementation Protocol
 
-- **Research First**: Before writing any new module or service, the Agent MUST use `grep_search` or `find_by_name` to find existing similar implementations in the codebase.
-- **Consistency**: Re-use existing utility patterns, decorators, and error-handling logic from the found examples to ensure the codebase remains unified.
-- **Action**: "I am searching for existing 'Auth' implementations to ensure consistency..."
+- **Algolia First**: Do not implement vector search manually. Use Algolia pattern: `SyncJob -> Algolia Index -> InstantSearch UI`.
+- **Consistency**: Re-use `SearchService` for all indexing operations.
 
 ## 3. Knowledge Retention
 

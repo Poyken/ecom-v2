@@ -74,13 +74,15 @@ Lưu trong:
 - **GitHub Secrets**: CI/CD variables
 - **Render/Vercel Dashboard**: Production env vars
 
-| Secret         | Nơi lưu           |
-| :------------- | :---------------- |
-| `DATABASE_URL` | Render + Vercel   |
-| `REDIS_URL`    | Render + Vercel   |
-| `JWT_SECRET`   | Render + Vercel   |
-| `VNPAY_*`      | Render only (API) |
-| `R2_*`         | Render only (API) |
+| Secret            | Nơi lưu                        |
+| :---------------- | :----------------------------- |
+| `DATABASE_URL`    | Render + Vercel                |
+| `REDIS_URL`       | Render + Vercel                |
+| `JWT_SECRET`      | Render + Vercel                |
+| `VNPAY_*`         | Render only (API)              |
+| `ALGOLIA_APP_ID`  | Render + Vercel                |
+| `ALGOLIA_API_KEY` | Render (Write) + Vercel (Read) |
+| `R2_*`            | Render only (API)              |
 
 ---
 
@@ -104,6 +106,13 @@ Lưu trong:
 # Vercel: One-click rollback trong dashboard
 # Database: Neon Point-in-time recovery
 ```
+
+### Cold Start Mitigation (Free Tier)
+
+Do Render Free/Starter sẽ sleep sau 15p không hoạt động:
+
+1.  **Setup UptimeRobot**: Ping `GET https://api.yourdomain.com/health` mỗi 5 phút.
+2.  **API Health Check**: Tạo endpoint `/health` trả về 200 OK nhẹ nhất có thể.
 
 ---
 

@@ -320,6 +320,31 @@ Lấy thông tin chi tiết đơn hàng.
 
 Tạo đơn hàng từ giỏ hàng.
 
+**Payload:**
+
+```typescript
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
+interface CreateOrderRequest {
+  cartId: string;
+  paymentMethod: string;
+  // Optional for Authenticated User, Required for Guest
+  guestInfo?: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    shippingAddress: Address;
+  };
+}
+```
+
 #### POST /orders/:id/cancel
 
 Hủy đơn hàng.
@@ -342,15 +367,26 @@ Xử lý thanh toán cho đơn hàng.
 
 #### GET /search/products
 
-Tìm kiếm sản phẩm với các bộ lọc nâng cao.
+Tìm kiếm sản phẩm sử dụng Algolia Engine.
+
+**Response (Algolia Format):**
+
+```typescript
+interface SearchResponse {
+  hits: Product[];
+  nbHits: number;
+  page: number;
+  nbPages: number;
+  facets: {
+    [key: string]: { [value: string]: number }; // e.g., color: { red: 5, blue: 2 }
+  };
+  processingTimeMS: number;
+}
+```
 
 #### GET /search/suggestions
 
-Gợi ý từ khóa tìm kiếm.
-
-#### GET /search/ai
-
-Tìm kiếm ngữ nghĩa được hỗ trợ bởi AI.
+Gợi ý từ khóa tìm kiếm (Algolia Query Suggestions).
 
 ---
 

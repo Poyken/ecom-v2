@@ -24,6 +24,7 @@
 | Database (PostgreSQL)    | Neon           |      $0       |
 | Cache (Redis)            | Upstash        |      $0       |
 | API Hosting              | Render Starter |      $7       |
+| Search Engine            | Algolia (Free) |      $0       |
 | Web Hosting              | Vercel         |      $0       |
 | Storage (S3-compatible)  | Cloudflare R2  |      $0       |
 | Email Transactional      | Resend         |      $0       |

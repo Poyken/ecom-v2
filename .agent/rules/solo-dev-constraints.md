@@ -14,10 +14,11 @@ The following features are **EXCLUDED** from current implementation:
 
 - SKU/Product Variants
 - Multi-warehouse inventory
-- AI-powered search (pgvector)
+- SKU/Product Variants
+- Multi-warehouse inventory
+- **Self-hosted** AI search (Use Algolia instead)
 - Loyalty points system
-- B2B features (tiered pricing, bulk orders)
-- Guest checkout
+- B2B features
 - Multi-currency support
 
 ### 2. Simplification Rules
@@ -32,8 +33,9 @@ The following features are **EXCLUDED** from current implementation:
 - Database: **Neon** (managed PostgreSQL)
 - Cache: **Upstash** (managed Redis)
 - Storage: **Cloudflare R2**
-- API Hosting: **Render** or **Railway**
+- API Hosting: **Render**
 - Web Hosting: **Vercel**
+- Search: **Algolia**
 - Email: **Resend**
 
 ### 4. Development Velocity

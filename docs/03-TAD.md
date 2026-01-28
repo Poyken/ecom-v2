@@ -1,4 +1,4 @@
-# Tài liệu Kiến trúc Kỹ thuật (TAD) - Solo Developer Edition
+# Tài liệu Kiến trúc Kỹ thuật (TAD) - Competitive Production Grade
 
 ## Nền tảng E-commerce Multi-tenant MVP
 
@@ -6,85 +6,107 @@
 
 ### Thông tin tài liệu
 
-**Phiên bản**: 2.0 (Solo Dev)  
+**Phiên bản**: 3.0 (Compact Enterprise)  
 **Ngày**: 28 tháng 1, 2026  
-**Tác giả**: Solo Developer
+**Chất lượng**: Production-Ready, Competitive Optimized
 
 ---
 
-### Tổng quan Kiến trúc (Managed Services)
+### 1. Triết lý: "Compact Enterprise"
 
-Kiến trúc được thiết kế tối ưu cho **Solo Developer**: không quản lý server (serverless/managed), chi phí thấp, vận hành tự động.
+Mục tiêu: Vận hành bởi 1 người, nhưng chất lượng ngang đội ngũ 10 người nhờ Automation & Architecture chuẩn.
+
+- **Zero Dirty Hacks**: Mọi dòng code phải clean, typed, và testable.
+- **Fail-Safe**: Hệ thống tự phục hồi hoặc degrade gracefully, không trắng trang.
+- **Speed as a Feature**: Nhanh hơn đối thủ là lợi thế cạnh tranh chính.
+
+---
+
+### 2. Architecture: Modular Monolith (Strict)
+
+Giữ Modular Monolith nhưng thêm các layer bảo vệ chất lượng.
 
 ```mermaid
 graph TD
-    User[Clients] --> CDN[Vercel Edge Network]
-    CDN --> Web[Next.js App (Vercel)]
-    User --> API_LB[Render Load Balancer]
-    API_LB --> API[NestJS API (Render)]
+    Client --> CDN[Vercel Edge]
+    CDN --> Web[Next.js 16 (Strict Mode)]
 
-    subgraph "Managed Data Layer"
-        API --> Redis[Upstash Redis (Cache/Queue)]
-        API --> DB[Neon PostgreSQL]
-        DB --> Vector[pgvector (AI Search - Phase 2)]
+    subgraph "Observability Wrapper"
+        Web --> API[NestJS API]
+        API --> Logger[Pino Structured Logger]
+        Logger --> Sentry[Error Tracking]
     end
 
-    subgraph "External Services"
-        API --> R2[Cloudflare R2 (Storage)]
-        API --> Email[Resend]
-        API --> Payment[VNPay]
+    subgraph "Resilience Layer"
+        API --> Redis[Upstash (Rate Limit + Cache)]
+        API --> DB[Neon Postgres (Connection Pooling)]
+    end
+
+    subgraph "Logic Organizaton (Folder Structure)"
+        API --> Auth[Auth Module]
+        API --> Catalog[Catalog Module]
+        API --> Order[Order Module]
+        API --> Search[Search Module (AI Powered)]
+    end
+
+    subgraph "Simple Communication"
+        Order -- Direct Call --> Catalog
+        Order -.->|Side Effect| EventEmitter[In-Memory Events]
+    end
+
+    subgraph "Reliability Layer"
+        Catalog -- Async Job --> SyncQueue[Redis Queue (BullMQ)]
+        SyncQueue -- Retry Policy --> Algolia[Algolia Index]
+    end
+
+    subgraph "Managed Data"
+        Auth --> Prisma
+        Catalog --> Prisma
+        Order --> Prisma
+        Prisma --> DB[Neon Postgres]
     end
 ```
 
-### Tech Stack Chi tiết
+#### Quy tắc Production-Ready cho Solo Dev:
 
-| Thành phần      | Công nghệ     | Dịch vụ Managed | Lý do chọn cho Solo Dev                         |
-| :-------------- | :------------ | :-------------- | :---------------------------------------------- |
-| **Frontend**    | Next.js 16    | Vercel          | Deploy git-to-prod, zero config                 |
-| **Backend**     | NestJS 11     | Render          | Support Docker, auto-deploy, healthy free tier  |
-| **Database**    | PostgreSQL 15 | Neon            | Serverless, branching, auto-suspend (tiết kiệm) |
-| **Cache/Queue** | Redis         | Upstash         | Serverless Redis, pay-per-request               |
-| **Storage**     | S3 API        | Cloudflare R2   | Không phí egress (băng thông), free 10GB        |
-| **Email**       | SMTP/API      | Resend          | DX tốt nhất, dev-friendly                       |
+1.  **Validation Layer (Zod/DTO)**: Validate 100% data đầu vào và đầu ra. Không bao giờ tin tưởng Client.
+2.  **Exception Filters**: Standardized Error Response (Message thân thiện user, Mã lỗi debug cho dev).
+3.  **Database Indexing**: Review Index trong mọi PR Migration để đảm bảo Query < 50ms.
 
 ---
 
-### Chiến lược Multi-tenant (MVP)
+### 3. Chiến lược Testing (Automated QA)
 
-Sử dụng **Logical Isolation** (Row-level Isolation) trên Database chia sẻ.
+Vì không có QA Tester, Code phải tự test chính nó.
 
-1. **Request Flow**:
-   - Client gửi `x-tenant-id` header (hoặc subdomain parse).
-   - Middleware `TenantMiddleware` validate và lưu vào `AsyncLocalStorage`.
-
-2. **Data Access**:
-   - Prisma Extension tự động inject `WHERE tenantId = ?` vào mọi query.
-   - **Backup**: RLS (Row Level Security) trong Postgres chặn truy cập chéo ở mức DB.
+- **Unit Test (Jest)**: 100% coverage cho Utils, Helpers, Pricing Logic.
+- **E2E Test (Playwright)**: Test tự động luồng critical **trước mỗi lần deploy**:
+  - "User Login -> Add to Cart -> Checkout -> Payment Mock -> Success".
+  - Nếu E2E fail, chặn Deploy ngay lập tức. Đây là "lưới an toàn" để bạn dám release liên tục.
 
 ---
 
-### Kiến trúc Deployment (CI/CD)
+### 4. Tech Stack (Realistic Next-Gen)
 
-**Github Actions** đóng vai trò orchestrator:
-
-1. **Push to Main**:
-   - Run Tests (Unit/E2E).
-   - Nếu Pass -> Trigger Vercel & Render deploy hook.
-2. **Database Migrations**:
-   - Chạy trong pipeline CI trước khi deploy API mới.
-   - Neon support instant branching để test migration an toàn.
+| Thành phần      | Công nghệ                 | Chiến lược Cạnh tranh                                                             |
+| :-------------- | :------------------------ | :-------------------------------------------------------------------------------- |
+| **API**         | **NestJS 11**             | Modular Monolith (Auth, Catalog, Order).                                          |
+| **Search**      | **Algolia (Recommended)** | Typo-tolerance, Faceting, Instant Search out-of-the-box. (Free tier 10k records). |
+| **Frontend**    | **Next.js 16**            | **Limited Optimistic UI**: Chỉ áp dụng cho Like/Cart. Không áp dụng Checkout.     |
+| **Performance** | **Upstash Redis**         | Cache API response để giảm tải DB và tăng tốc.                                    |
+| **Build Time**  | < 5 phút                  | Turbo Remote Cache                                                                |
 
 ---
 
-### Giám sát & Logs (Zero-setup)
+### 5. Deployment an toàn (Zero Downtime)
 
-- **Logs**: Xem trực tiếp trên Dashboard Vercel & Render.
-- **Errors**: Sentry (Free tier) bắt exception realtime.
-- **Uptime**: UptimeRobot ping API 5 phút/lần.
+- **Rolling Updates**: Render hỗ trợ Zero-downtime deploy (khởi động container mới, healthcheck OK mới tắt container cũ).
+- **Database Migrations**: Luôn tương thích ngược (Add column -> Deploy Code -> Remove column sau). Không bao giờ break code đang chạy.
 
 ---
 
 ### Phê duyệt
 
 **Solo Developer**: ✅ Self-approved  
+**Tiêu chuẩn**: High Performance & Reliability  
 **Ngày**: 2026-01-28

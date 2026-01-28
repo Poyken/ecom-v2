@@ -4,7 +4,7 @@ description: Standardized procedure for implementing or modifying DB schemas.
 
 # Workflow: Schema Modification & Data Migration
 
-## Phase 1: Impact Analysis (Source: docs/18-Data-Migration-Strategy.md)
+## Phase 1: Impact Analysis
 
 1.  **Draft Migration**: Create the `schema.prisma` change.
 2.  **Verify Integrity**: Ensure the new schema includes `tenantId` and complies with `docs/04-Database-Design.md`.
@@ -19,8 +19,8 @@ description: Standardized procedure for implementing or modifying DB schemas.
 ## Phase 3: Deployment Strategy
 
 1.  **Staging Test**: Deploy to the Staging environment with a copy of production data (masked).
-2.  **Production Rollout**: Execute during low-traffic windows as defined in `docs/10-Operations-Maintenance.md`.
-3.  **Verification**: Run database health checks and monitoring dashboard (docs/15-Monitoring-Alerting.md).
+2.  **Production Rollout**: Execute during low-traffic windows.
+3.  **Verification**: Run database health checks and monitoring dashboard overlay.
 
 ## Phase 4: Audit
 
