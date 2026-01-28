@@ -6,12 +6,16 @@
 
 ### Tóm tắt Điều hành
 
-**Tên dự án**: Nền tảng E-commerce 2.0 Multi-tenant  
-**Phiên bản**: 1.0  
-**Ngày**: 22 tháng 1, 2026  
-**Tác giả**: Đội ngũ Phát triển
+**Tên dự án**: Nền tảng E-commerce Multi-tenant MVP  
+**Phiên bản**: 2.0 (Solo Dev Edition)  
+**Ngày**: 28 tháng 1, 2026  
+**Tác giả**: Solo Developer  
+**Chiến lược**: MVP-first với Managed Services
 
-Tài liệu này vạch ra các yêu cầu kinh doanh cho một nền tảng e-commerce toàn diện cho phép nhiều tenants (cửa hàng) hoạt động độc lập trên cơ sở hạ tầng chia sẻ. Nền tảng sẽ phục vụ các mô hình kinh doanh B2C, B2B và B2B2C với các tính năng nâng cao bao gồm tìm kiếm được hỗ trợ bởi AI, tồn kho đa kho và phân tích toàn diện.
+> [!IMPORTANT]
+> **Solo Developer Strategy**: Dự án được phát triển bởi một developer duy nhất. Xem `decisions.md#7` và `.agent/rules/solo-dev-constraints.md` cho chi tiết.
+
+Tài liệu này vạch ra các yêu cầu kinh doanh cho MVP của nền tảng e-commerce multi-tenant. **Focus MVP**: B2C tại thị trường Việt Nam với VNPay integration. Các tính năng B2B, AI search, multi-warehouse sẽ triển khai ở Phase 2-3.
 
 ---
 
@@ -46,21 +50,27 @@ Tài liệu này vạch ra các yêu cầu kinh doanh cho một nền tảng e-c
 
 ---
 
-### Mục tiêu Kinh doanh
+### Mục tiêu Kinh doanh (Solo Dev MVP)
 
-#### Mục tiêu Chính
+#### Mục tiêu MVP (4 tháng)
 
-1. **Thâm nhập thị trường**: Ra mắt MVP trong 6 tháng nhắm mục tiêu 100+ tenants
-2. **Tăng trưởng Doanh thu**: Đạt $1M ARR trong 18 tháng
-3. **Sự chấp nhận của Người dùng**: 10.000+ khách hàng cuối hoạt động trong năm đầu tiên
-4. **Sự ổn định của Nền tảng**: 99,9% thời gian hoạt động với tốc độ tải trang dưới 2 giây
+1. **Ra mắt MVP**: 4 tháng với **10-20 tenants** beta
+2. **Doanh thu đầu tiên**: Đạt **$500 MRR** trong 6 tháng
+3. **Người dùng**: **500 khách hàng cuối** hoạt động
+4. **Ổn định**: 99% uptime với tải trang < 3 giây
 
-#### Mục tiêu Phụ
+#### Mục tiêu Phase 2 (tháng 5-8)
 
-1. **Hoàn thiện Tính năng**: Đáp ứng 80% các trường hợp sử dụng e-commerce phổ biến
-2. **Mở rộng Quốc tế**: Hỗ trợ đa tiền tệ và đa ngôn ngữ
-3. **Ưu tiên Di động**: 60%+ lưu lượng truy cập từ thiết bị di động
-4. **Tích hợp AI**: Công cụ tìm kiếm ngữ nghĩa và gợi ý sản phẩm
+1. Mở rộng lên **50+ tenants**
+2. Thêm **variants/SKU** support
+3. Đạt **$2K MRR**
+
+#### ~~Mục tiêu Cũ (Không áp dụng cho MVP)~~
+
+- ~~100+ tenants trong 6 tháng~~
+- ~~$1M ARR trong 18 tháng~~
+- ~~Đa tiền tệ, đa ngôn ngữ~~
+- ~~AI search, recommendations~~
 
 ---
 
@@ -278,14 +288,14 @@ Tài liệu này vạch ra các yêu cầu kinh doanh cho một nền tảng e-c
 
 ### Phê duyệt
 
-**Nhà bảo trợ Dự án**: ********\_\_\_********  
-**Ngày**: ********\_\_\_********  
-**Chữ ký**: ********\_\_\_********
+**Nhà bảo trợ Dự án**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Ngày**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Chữ ký**: **\*\*\*\***\_\_\_**\*\*\*\***
 
-**Trưởng nhóm Kỹ thuật**: ********\_\_\_********  
-**Ngày**: ********\_\_\_********  
-**Chữ ký**: ********\_\_\_********
+**Trưởng nhóm Kỹ thuật**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Ngày**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Chữ ký**: **\*\*\*\***\_\_\_**\*\*\*\***
 
-**Chủ sở hữu Kinh doanh**: ********\_\_\_********  
-**Ngày**: ********\_\_\_********  
-**Chữ ký**: ********\_\_\_********
+**Chủ sở hữu Kinh doanh**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Ngày**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Chữ ký**: **\*\*\*\***\_\_\_**\*\*\*\***

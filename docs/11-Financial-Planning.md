@@ -1,105 +1,88 @@
-# Kế hoạch Tài chính
+# Kế hoạch Tài chính (Solo Developer Edition)
 
-## Nền tảng E-commerce Multi-tenant
+## Nền tảng E-commerce Multi-tenant MVP
 
 ---
 
 ### Thông tin tài liệu
 
-**Phiên bản**: 1.0  
-**Ngày**: 22 tháng 1, 2026  
-**Tác giả**: Đội ngũ Tài chính  
-**Trạng thái**: Bản nháp
+**Phiên bản**: 2.0 (Solo Dev)  
+**Ngày**: 28 tháng 1, 2026  
+**Tác giả**: Solo Developer
+
+> [!NOTE]
+> Tài liệu này thay thế phiên bản enterprise ($500K budget). Solo dev sử dụng bootstrap approach với chi phí tối thiểu.
 
 ---
 
-### Tổng quan Kế hoạch Tài chính
+### Chi Phí Vận Hành
 
-#### Mục tiêu Tài chính
+#### Monthly Infrastructure (Managed Services)
 
-1. **Tăng trưởng Doanh thu**: Đạt mức doanh thu định kỳ hằng năm (ARR) là 1 triệu USD trong vòng 18 tháng.
-2. **Khả năng sinh lời**: Đạt điểm hòa vốn (Break-even) trong vòng 24 tháng.
-3. **Dòng tiền**: Duy trì quỹ dự phòng tài chính (Cash buffer) đủ dùng trong 6 tháng.
-4. **ROI**: Mang lại tỷ suất hoàn vốn 25% cho các nhà đầu tư trong vòng 3 năm.
+| Service                  | Provider       |  Cost/Month   |
+| :----------------------- | :------------- | :-----------: |
+| Database (PostgreSQL)    | Neon           |      $0       |
+| Cache (Redis)            | Upstash        |      $0       |
+| API Hosting              | Render Starter |      $7       |
+| Web Hosting              | Vercel         |      $0       |
+| Storage (S3-compatible)  | Cloudflare R2  |      $0       |
+| Email Transactional      | Resend         |      $0       |
+| Domain (.com)            | Namecheap      |      ~$1      |
+| **Total Infrastructure** |                | **~$8/month** |
 
-#### Chiến lược Tài chính
+#### When Scaling (50+ tenants)
 
-- **Doanh thu**: Tập trung vào thuê bao hằng tháng (SaaS) và phí giao dịch.
-- **Quản lý chi phí**: Tối ưu hóa hạ tầng Cloud và chi phí nhân sự.
-- **Đầu tư**: Ưu tiên vào R&D sản phẩm và mở rộng thị trường (Sales & Marketing).
-
----
-
-### Mô hình Doanh thu
-
-#### Các gói giá (Pricing Tiers)
-
-1. **Khởi nghiệp (Starter)**:
-   - Giá: $29/tháng.
-   - Giới hạn: 100 sản phẩm, 500 đơn hàng/tháng.
-   - Phí giao dịch: 1.0%.
-2. **Chuyên nghiệp (Professional)**:
-   - Giá: $99/tháng.
-   - Giới hạn: 1,000 sản phẩm, 5,000 đơn hàng/tháng.
-   - Tính năng thêm: Truy cập API, đa tiền tệ.
-   - Phí giao dịch: 0.5%.
-3. **Doanh nghiệp (Enterprise)**:
-   - Giá: $299/tháng.
-   - Giới hạn: Không giới hạn sản phẩm/đơn hàng.
-   - Tính năng thêm: Quản lý đa cửa hàng, tích hợp tùy chỉnh, cam kết SLA.
-   - Phí giao dịch: 0.25%.
-
-#### Các nguồn thu khác
-
-- Phí dịch vụ chuyên nghiệp (Cài đặt, tùy chỉnh theo yêu cầu).
-- Doanh thu từ chợ ứng dụng (App Marketplace - % chiết khấu từ bên thứ 3).
-- Gói phân tích dữ liệu nâng cao (Add-on).
+| Service          | Upgrade To  |   Cost/Month   |
+| :--------------- | :---------- | :------------: |
+| Database         | Neon Pro    |      $19       |
+| Cache            | Upstash Pro |      $10       |
+| API              | Render Pro  |      $25       |
+| **Total Scaled** |             | **~$55/month** |
 
 ---
 
-### Cấu trúc Chi phí
+### Mô Hình Doanh Thu (Vietnam Market)
 
-#### Chi phí Nhân sự
+#### Pricing Tiers (VNĐ)
 
-- Đội ngũ phát triển (Backend, Frontend, DevOps, QA, UI/UX).
-- Đội ngũ quản lý (Tech Lead, Product Owner).
-- Đội ngũ hỗ trợ và giúp khách hàng thành công (Support, Customer Success).
+| Gói         |       Giá/Tháng | Products  |  Orders   | Phí GD |
+| :---------- | --------------: | :-------: | :-------: | :----: |
+| **Starter** |   99,000₫ (~$4) |    50     |    200    |  1.5%  |
+| **Growth**  |  199,000₫ (~$8) |    200    |   1000    |  1.0%  |
+| **Pro**     | 399,000₫ (~$16) | Unlimited | Unlimited |  0.5%  |
 
-#### Chi phí Hạ tầng & Vận hành
+#### Break-even Analysis
 
-- Dịch vụ Cloud (Compute, Database, Storage, CDN).
-- Dịch vụ bên thứ ba (Cổng thanh toán, Email, Analytics, Security).
-- Marketing & Bán hàng (Quảng cáo số, sự kiện, công cụ bán hàng).
-- Quản lý chung (Văn phòng, pháp lý, kế toán, bảo hiểm).
-
----
-
-### Lập ngân sách và Kiểm soát
-
-- **Phân bổ ngân sách**: Engineering (40%), Sales & Marketing (25%), Operation (20%), Customer Success (15%).
-- **Ngưỡng phê duyệt**: Trưởng bộ phận (< $5,000), CFO (< $25,000), CEO (< $100,000).
-- **Đánh giá định kỳ**: Hằng tháng so sánh thực tế so với ngân sách dự kiến.
+| Scenario          | Tenants Needed |  MRR  |
+| :---------------- | :------------: | :---: |
+| Cover Infra ($8)  |   2 Starter    |  $8   |
+| Cover Time ($500) |   30 Growth    | $240  |
+| Profitable        |   50+ Growth   | $400+ |
 
 ---
 
-### Quản trị Rủi ro Tài chính
+### Tài Chính Dự Kiến 12 Tháng
 
-- **Rủi ro doanh thu**: Tập trung đa dạng hóa khách hàng, theo dõi tỷ lệ rời bỏ (Churn Rate).
-- **Rủi ro dòng tiền**: Báo cáo vị thế tiền mặt hằng ngày, dự báo dòng tiền 12-24 tháng.
-- **Kiểm soát nội bộ**: Quy trình phê duyệt chi phí, đối soát doanh thu hằng tháng, tuân thủ các quy định về thuế và kiểm toán.
+| Tháng |   Tenants    | MRR (USD) | Chi phí |  Net  |
+| :---: | :----------: | :-------: | :-----: | :---: |
+|  1-4  | 0 (building) |    $0     |   $8    | -$32  |
+|   5   |      5       |    $20    |   $8    | +$12  |
+|   6   |      10      |    $50    |   $8    | +$42  |
+|  7-8  |      20      |   $120    |   $15   | +$105 |
+| 9-10  |      35      |   $200    |   $25   | +$175 |
+| 11-12 |      50      |   $300    |   $55   | +$245 |
+
+**Tổng Year 1**: ~$500 profit (không tính thời gian dev)
 
 ---
 
-### Quan hệ Nhà đầu tư và Gọi vốn
+### ~~Kế hoạch Gọi Vốn (Không Áp Dụng)~~
 
-- **Vòng Seed (Q2 2026)**: Mục tiêu $500,000 để phát triển sản phẩm và mở rộng đội ngũ.
-- **Vòng Series A (Q2 2027)**: Mục tiêu $2.5M để đẩy mạnh Sales & Marketing.
-- **Vòng Series B (Q2 2028)**: Mục tiêu $10M để mở rộng thị trường quốc tế và mua lại (M&A).
+> Chiến lược Solo Dev sử dụng **bootstrap approach**. Không gọi vốn trong giai đoạn MVP. Chỉ xem xét funding nếu đạt product-market fit (50+ paying tenants).
 
 ---
 
 ### Phê duyệt
 
-**Giám đốc Tài chính (CFO)**: ********\_\_\_********  
-**Giám đốc Điều hành (CEO)**: ********\_\_\_********  
-**Hội đồng Quản trị**: ********\_\_\_********
+**Solo Developer**: ✅ Self-approved  
+**Ngày**: 2026-01-28

@@ -46,3 +46,17 @@ This file tracks critical decisions made during the project to ensure long-term 
 - **Rationale**: High adoption in local market and support for QR/Napas.
 - **Date**: 2026-01-26
 - **Status**: Planned (Sprint 3)
+
+## 7. Solo Developer Strategy
+
+- **Decision**: Adopt MVP-first approach with managed services for solo dev execution.
+- **Context**: Project will be developed and maintained by a single developer.
+- **Key Changes**:
+  - **Scope Reduction**: Remove variants, multi-warehouse, AI search, B2B features from MVP
+  - **Infrastructure**: Use managed services (Neon, Upstash, Vercel, Render) instead of self-hosted
+  - **Timeline**: 4 months (16 weeks) to MVP instead of 6 months (9 sprints)
+  - **Security**: 4-layer defense (Middleware → Prisma Extension → RLS → Auto-tests)
+  - **Target Market**: Vietnam-only, niche down to specific vertical
+- **Cost Estimate**: ~$8/month (free tiers)
+- **Date**: 2026-01-28
+- **Status**: Active

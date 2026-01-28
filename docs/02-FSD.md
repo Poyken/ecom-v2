@@ -1,41 +1,44 @@
 # Tài liệu Thông số Chức năng (FSD)
 
-## Nền tảng E-commerce Multi-tenant
+## Nền tảng E-commerce Multi-tenant MVP
 
 ---
 
 ### Thông tin tài liệu
 
-**Phiên bản**: 1.0  
-**Ngày**: 22 tháng 1, 2026  
-**Tác giả**: Đội ngũ Phát triển  
-**Trạng thái**: Bản nháp
+**Phiên bản**: 2.0 (Solo Dev Edition)  
+**Ngày**: 28 tháng 1, 2026  
+**Tác giả**: Solo Developer  
+**Trạng thái**: MVP Scope
+
+> [!IMPORTANT]
+> **MVP Legend**: ✅ = MVP | ⚠️ = Simplified | ❌ = Phase 2+
 
 ---
 
 ### Phân loại Tính năng theo Modules
 
-#### 1. Module Quản lý Danh tính & Truy cập
+#### 1. Module Quản lý Danh tính & Truy cập ✅ MVP
 
-##### 1.1 Hệ thống Xác thực
+##### 1.1 Hệ thống Xác thực ✅ MVP (Simplified)
 
-**User Story**: Là người dùng, tôi muốn xác thực bảo mật với nhiều lựa chọn để có thể truy cập nền tảng một cách thuận tiện.
+**User Story**: Là người dùng, tôi muốn xác thực bảo mật để có thể truy cập nền tảng.
 
-**Tiêu chí Chấp nhận**:
+**Tiêu chí Chấp nhận (MVP)**:
 
-- Hỗ trợ xác thực email/password với bcrypt hashing
-- Bật đăng nhập xã hội (Google, Facebook) với OAuth 2.0
-- Triển khai xác thực hai yếu tố sử dụng TOTP
-- Cung cấp chức năng đặt lại mật khẩu với xác thực email
-- Hỗ trợ quản lý session với JWT tokens
-- Bật chức năng ghi nhớ tôi với refresh tokens bảo mật
+- ✅ Hỗ trợ xác thực email/password với bcrypt hashing
+- ❌ ~~Bật đăng nhập xã hội (Google, Facebook)~~ → Phase 2
+- ❌ ~~Triển khai xác thực hai yếu tố~~ → Phase 2
+- ✅ Cung cấp chức năng đặt lại mật khẩu với xác thực email
+- ✅ Hỗ trợ quản lý session với JWT tokens
+- ✅ Bật chức năng ghi nhớ tôi với refresh tokens bảo mật
 
 **Quy tắc Kinh doanh**:
 
 - Mật khẩu tối thiểu 8 ký tự với yêu cầu về độ phức tạp
 - Session hết hạn sau 30 phút không hoạt động
 - Tối đa 5 lần đăng nhập thất bại trước khi khóa tài khoản
-- Tài khoản đăng nhập mạng xã hội phải được xác minh trước khi truy cập
+- ~~Tài khoản đăng nhập mạng xã hội~~ (Không áp dụng MVP)
 
 ##### 1.2 Quản lý Người dùng
 
@@ -591,14 +594,14 @@ Cập nhật sản phẩm → Xác thực → Cập nhật DB → Xóa cache →
 
 ### Phê duyệt
 
-**Trưởng nhóm Chức năng**: ********\_\_\_********  
-**Ngày**: ********\_\_\_********  
-**Chữ ký**: ********\_\_\_********
+**Trưởng nhóm Chức năng**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Ngày**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Chữ ký**: **\*\*\*\***\_\_\_**\*\*\*\***
 
-**Trưởng nhóm Kỹ thuật**: ********\_\_\_********  
-**Ngày**: ********\_\_\_********  
-**Chữ ký**: ********\_\_\_********
+**Trưởng nhóm Kỹ thuật**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Ngày**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Chữ ký**: **\*\*\*\***\_\_\_**\*\*\*\***
 
-**Chủ sở hữu Kinh doanh**: ********\_\_\_********  
-**Ngày**: ********\_\_\_********  
-**Chữ ký**: ********\_\_\_********
+**Chủ sở hữu Kinh doanh**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Ngày**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Chữ ký**: **\*\*\*\***\_\_\_**\*\*\*\***

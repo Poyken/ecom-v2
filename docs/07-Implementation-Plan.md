@@ -1,88 +1,117 @@
-# Kế hoạch Triển khai
+# Kế hoạch Triển khai (Solo Developer Edition)
 
-## Nền tảng E-commerce Multi-tenant
+## Nền tảng E-commerce Multi-tenant MVP
 
 ---
 
 ### Thông tin tài liệu
 
-**Phiên bản**: 1.0  
-**Ngày**: 22 tháng 1, 2026  
-**Tác giả**: Đội ngũ Quản lý Dự án  
-**Trạng thái**: Bản nháp  
-**Thời gian dự kiến**: 6 tháng  
-**Chu kỳ Sprint**: 2 tuần
+**Phiên bản**: 2.0 (Solo Dev)  
+**Ngày**: 28 tháng 1, 2026  
+**Tác giả**: Solo Developer  
+**Thời gian dự kiến**: **4 tháng** (16 tuần)
+
+> [!IMPORTANT]
+> Tài liệu này thay thế phiên bản cũ (9 sprints/6 tháng). Xem `decisions.md#7` cho context.
 
 ---
 
-### Tổng quan Dự án
+### Tổng quan MVP
 
-#### Mục tiêu Dự án
+#### Scope In (MVP)
 
-1. **Ra mắt MVP**: Xây dựng nền tảng e-commerce multi-tenant có khả năng mở rộng, bảo mật và hiệu suất cao. Hỗ trợ đa mô hình (B2C, B2B, B2B2C) với các tính năng nâng cao như tìm kiếm AI và phân tích thời gian thực.
-2. **Chiếm lĩnh thị trường**: Đạt mốc 100+ tenants trả phí trong 3 tháng đầu.
-3. **Chất lượng kỹ thuật**: Đảm bảo kiến trúc dễ bảo trì và có khả năng mở rộng tốt.
-4. **Trải nghiệm người dùng**: Cung cấp giao diện xuất sắc cho cả chủ cửa hàng và khách mua hàng.
+- ✅ Multi-tenant với tenant isolation
+- ✅ Auth (Email/Password + JWT)
+- ✅ CRUD Products (không có variants)
+- ✅ Categories (1 cấp, không phân cấp)
+- ✅ Cart + Checkout (logged-in users only)
+- ✅ VNPay Integration
+- ✅ Basic Order Management
+- ✅ Simple Admin Dashboard
 
-#### Chỉ số thành công (KPIs)
+#### Scope Out (Phase 2+)
 
-- **Kỹ thuật**: 99.9% uptime, thời gian tải trang < 2s, độ bao phủ test > 80%.
-- **Kinh doanh**: 100+ tenants, doanh thu hàng tháng đạt mục tiêu, tỷ lệ rời bỏ (churn rate) < 5%.
-- **Người dùng**: Điểm hài lòng khách hàng > 4.5/5, tỷ lệ chuyển đổi > 3%.
-
----
-
-### Lộ trình thực hiện (Sprint Breakdown)
-
-#### Giai đoạn 1: Nền tảng & Catalog (Sprints 1-3)
-
-- **Sprint 1: Kiến trúc Multi-tenant & Định danh (HOÀN THÀNH)**:
-  - Hạ tầng NestJS (Port 8080) & Next.js (Port 3000).
-  - Hệ thống Auth (JWT, Passport).
-  - Middleware cô lập Tenant qua Headers & AsyncLocalStorage.
-  - Swagger Documentation & Global Exception Filters.
-- **Sprint 2: Quản lý Sản phẩm & Storefront cơ bản (HIỆN TẠI)**:
-  - CRUD Sản phẩm, Biến thể (SKUs), Danh mục.
-  - Quản lý hình ảnh (Upload/S3).
-  - Trang chủ Storefront Monochrome & Danh sách sản phẩm.
-- **Sprint 3: Giỏ hàng & Thanh toán VNPay**:
-  - Logic giỏ hàng (Redis side-car).
-  - Quy trình Checkout đa bước.
-  - **Tích hợp VNPay Sandbox**: Xử lý tạo URL thanh toán, Webhook (IPN) và đối soát giao dịch.
-
-#### Giai đoạn 2: Vận hành & Tồn kho (Sprints 4-6)
-
-- **Sprint 4: Quản lý Đơn hàng (Merchant)**: CMS xử lý trạng thái đơn hàng, In hóa đơn (PDF).
-- **Sprint 5: Hệ thống Đa kho (Multi-warehouse)**: Theo dõi tồn kho theo vị trí, Logic trừ kho thông minh (Atomic DB updates).
-- **Sprint 6: Admin Dashboard**: Biểu đồ doanh thu thời gian thực, Quản lý Tenant & Gói dịch vụ.
-
-#### Giai đoạn 3: Tối ưu & Đột phá (Sprints 7-9)
-
-- **Sprint 7: Marketing & Khuyến mãi**: Mã giảm giá, Flash sale, Loyalty points.
-- **Sprint 8: Tìm kiếm AI & Gợi ý**: Semantic Search (pgvector), Recommendation Engine.
-- **Sprint 9: Tối ưu hiệu suất & Hardening**: Caching đa lớp, Rate limiting per tenant, Security Audit (GDPR context).
+- ❌ SKU/Product Variants
+- ❌ Multi-warehouse Inventory
+- ❌ AI Search (pgvector)
+- ❌ Loyalty Points
+- ❌ B2B Features
+- ❌ Guest Checkout
+- ❌ Social Login
+- ❌ Multi-currency
 
 ---
 
-### Đánh giá Rủi ro & Giảm thiểu
+### Timeline 4 Tháng
 
-- **Độ phức tạp của Multi-tenancy**: Rủi ro rò rỉ dữ liệu giữa các tenant. Giảm thiểu bằng cách kiểm thử cách ly nghiêm ngặt ở lớp Middleware và Cơ sở dữ liệu.
-- **Hiệu suất hệ thống**: Rủi ro khi lượng truy cập tăng đột biến. Giảm thiểu bằng chiến lược auto-scaling và caching đa lớp.
-- **Tích hợp bên thứ ba**: Các cổng thanh toán hoặc đơn vị vận chuyển thay đổi API. Giảm thiểu bằng cách xây dựng các Adapter linh hoạt.
+|   Tuần    | Focus       | Deliverable                             | Status |
+| :-------: | :---------- | :-------------------------------------- | :----: |
+|  **1-2**  | Foundation  | Monorepo, Auth, Tenant Middleware       |  [ ]   |
+|  **3-4**  | Products    | CRUD Products, Image Upload, Categories |  [ ]   |
+|  **5-6**  | Storefront  | Product List, Detail, Cart (Redis)      |  [ ]   |
+|  **7-8**  | Commerce    | VNPay, Checkout, Order Creation         |  [ ]   |
+| **9-10**  | Admin       | Dashboard, Order Management             |  [ ]   |
+| **11-12** | Polish      | Bug fixes, Performance, Deploy          |  [ ]   |
+| **13-14** | Soft Launch | 5-10 Beta Customers                     |  [ ]   |
+| **15-16** | Iterate     | Feedback → Improvements                 |  [ ]   |
 
 ---
 
-### Chiến lược Đảm bảo Chất lượng (QA)
+### Infrastructure (Managed Services)
 
-- **Kiểm thử Đơn vị (Unit Test)**: Bắt buộc cho logic nghiệp vụ quan trọng.
-- **Kiểm thử Tích hợp (Integration Test)**: Kiểm tra các luồng API và tương tác DB.
-- **Kiểm thử Chấp nhận (UAT)**: Xác nhận tính năng đáp ứng yêu cầu người dùng cuối.
-- **Kiểm thử Hiệu năng**: Chạy load test để đảm bảo hệ thống chịu tải tốt.
+| Service     | Provider      |  Cost/Month   | Tier           |
+| :---------- | :------------ | :-----------: | :------------- |
+| Database    | Neon          |      $0       | Free (0.5GB)   |
+| Cache       | Upstash       |      $0       | Free (10K/day) |
+| API Hosting | Render        |      $7       | Starter        |
+| Web Hosting | Vercel        |      $0       | Free           |
+| Storage     | Cloudflare R2 |      $0       | Free (10GB)    |
+| Email       | Resend        |      $0       | Free (3K/mo)   |
+| Domain      | Any           |      ~$1      | .com           |
+| **Total**   |               | **~$8/month** |                |
+
+---
+
+### Daily Workflow (Solo Dev)
+
+```
+Morning (2h):   Planning + Self PR Review
+Afternoon (4h): Coding Sprint (1 feature/day)
+Evening (1h):   Testing + Deploy + Docs
+```
+
+#### Tools
+
+- **Code**: VS Code + Cursor AI + Gemini CLI
+- **Version Control**: GitHub + GitHub Actions
+- **Monitoring**: Sentry (free) + Uptime Robot (free)
+
+---
+
+### Risk Mitigation
+
+| Risk        | Mitigation                                          |
+| :---------- | :-------------------------------------------------- |
+| Burnout     | Ship every 2 weeks, không perfectionism             |
+| Scope Creep | Strict MVP scope trong `.agent/rules/`              |
+| Security    | 4-layer defense (Middleware → Prisma → RLS → Tests) |
+| No Users    | Soft launch với 5 beta customers trước              |
+
+---
+
+### KPIs
+
+| Metric        | Target (4 months) |
+| :------------ | :---------------- |
+| Tenants       | 10-20             |
+| MRR           | $100-500          |
+| Uptime        | 99%               |
+| Page Load     | < 3s              |
+| Test Coverage | > 60%             |
 
 ---
 
 ### Phê duyệt
 
-**Quản lý Dự án**: **\*\*\*\***\_\_\_**\*\*\*\***  
-**Trưởng nhóm Kỹ thuật**: **\*\*\*\***\_\_\_**\*\*\*\***  
-**Chủ sở hữu Sản phẩm**: **\*\*\*\***\_\_\_**\*\*\*\***
+**Solo Developer**: ✅ Self-approved  
+**Ngày**: 2026-01-28

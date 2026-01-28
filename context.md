@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Source of Truth
 
-This is an enterprise-grade platform for B2C, B2B, and B2B2C. The **Source of Truth** is `docs/`. Architectural continuity is maintained via `decisions.md`.
+This is a **MVP-first** multi-tenant e-commerce platform for **B2C** (Vietnam market). Developed by a **solo developer** with managed services. The **Source of Truth** is `docs/`. Architectural decisions in `decisions.md`. See Decision #7 for Solo Dev Strategy.
 
 ## 2. Advanced Agentic Intelligence
 

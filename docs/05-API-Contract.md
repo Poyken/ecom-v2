@@ -1,15 +1,21 @@
-# Tài liệu Hợp đồng API
+# Tài liệu# Hợp đồng API (API Contract) - MVP
 
-## Nền tảng E-commerce Multi-tenant
+## Nền tảng E-commerce Multi-tenant MVP
 
 ---
 
 ### Thông tin tài liệu
 
-**Phiên bản**: 1.0  
-**Ngày**: 22 tháng 1, 2026  
-**Tác giả**: Đội ngũ Phát triển  
-**Trạng thái**: Bản nháp  
+**Phiên bản**: 2.0 (Solo Dev)  
+**Ngày**: 28 tháng 1, 2026  
+**Trạng thái**: MVP Reference
+
+> [!NOTE]
+> Tài liệu này mô tả các endpoint cốt lõi cho MVP (Auth, Product, Cart, Order).
+> Các endpoint nâng cao (B2B, Multi-warehouse) xem trong `archive_enterprise/`.
+
+---
+
 **Phiên bản API**: v1  
 **URL Cơ sở**: `https://api.ecommerce.com/api/v1`
 
@@ -439,14 +445,14 @@ Xử lý các thông báo từ đơn vị vận chuyển.
 
 ### Phê duyệt
 
-**Kiến trúc sư API**: ********\_\_\_********  
-**Ngày**: ********\_\_\_********  
-**Chữ ký**: ********\_\_\_********
+**Kiến trúc sư API**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Ngày**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Chữ ký**: **\*\*\*\***\_\_\_**\*\*\*\***
 
-**Lập trình viên Trưởng**: ********\_\_\_********  
-**Ngày**: ********\_\_\_********  
-**Chữ ký**: ********\_\_\_********
+**Lập trình viên Trưởng**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Ngày**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Chữ ký**: **\*\*\*\***\_\_\_**\*\*\*\***
 
-**Trưởng nhóm QA**: ********\_\_\_********  
-**Ngày**: ********\_\_\_********  
-**Chữ ký**: ********\_\_\_********
+**Trưởng nhóm QA**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Ngày**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Chữ ký**: **\*\*\*\***\_\_\_**\*\*\*\***
